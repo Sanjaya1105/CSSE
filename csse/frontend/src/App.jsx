@@ -4,6 +4,7 @@ import Register from './components/Register'
 import PatientDashboard from './components/PatientDashboard'
 import DoctorDashboard from './components/DoctorDashboard'
 import NurseDashboard from './components/NurseDashboard'
+import SuperAdminDashboard from './components/SuperAdminDashboard'
 import './App.css'
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Route path="/patient-dashboard" element={<PatientDashboard />} />
           <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
           <Route path="/nurse-dashboard" element={<NurseDashboard />} />
+          <Route path="/superadmin-dashboard" element={<SuperAdminDashboard />} />
         </Routes>
       </div>
     </Router>

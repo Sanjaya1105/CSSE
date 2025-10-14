@@ -26,11 +26,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
 
+
 // Register routes
 app.use('/api/register', require('./routes/registerRoutes'));
 
 // Login routes
 app.use('/api/login', require('./routes/loginRoutes'));
+
+// Super Admin routes
+app.use('/api/superadmin', require('./routes/superAdminRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

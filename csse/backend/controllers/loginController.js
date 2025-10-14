@@ -17,6 +17,34 @@ const loginUser = async (req, res) => {
       });
     }
 
+    // Super Admin login using password from database
+    if (email === 'superadmin@gmail.com') {
+      const fs = require('fs');
+      const path = require('path');
+      const superAdminFile = path.join(__dirname, '../models/superadmin.json');
+      let superAdminData;
+      try {
+        superAdminData = JSON.parse(fs.readFileSync(superAdminFile, 'utf8'));
+      } catch {
+        return res.status(500).json({ success: false, message: 'Super Admin data error' });
+      }
+      const isPasswordMatch = await bcrypt.compare(password, superAdminData.password);
+      if (isPasswordMatch) {
+        return res.status(200).json({
+          success: true,
+          message: 'Login successful',
+          data: {
+            user: {
+              email: 'superadmin@gmail.com',
+              name: 'Super Admin'
+            },
+            userType: 'superadmin'
+          }
+        });
+      } else {
+        return res.status(401).json({ success: false, message: 'Invalid email or password' });
+      }
+    }
     // Search in all three collections
     let user = null;
     let userType = null;
