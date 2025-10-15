@@ -1,0 +1,74 @@
+const Appointment = require('../models/Appointment');
+const DoctorBooking = require('../models/DoctorBooking');
+
+// Get available slots for a doctor on a date
+exports.getAvailableSlots = async (req, res) => {
+  const { doctorId, date } = req.query;
+  try {
+    const doctor = await DoctorBooking.findById(doctorId);
+    if (!doctor) return res.status(404).json({ error: 'Doctor not found' });
+    // Calculate slots
+    const startHour = parseInt(doctor.startTime.split(':')[0], 10);
+    const endHour = parseInt(doctor.endTime.split(':')[0], 10);
+    const slots = [];
+    for (let h = startHour; h < endHour; h++) {
+      for (let m = 0; m < 60; m += 15) {
+        const hourStr = h.toString().padStart(2, '0');
+        const minStr = m.toString().padStart(2, '0');
+        slots.push(`${hourStr}:${minStr}`);
+      }
+    }
+    // Remove booked slots
+    const appointments = await Appointment.find({ doctorId, date });
+    const bookedSlots = appointments.map(a => a.slotTime);
+    const availableSlots = slots.filter(s => !bookedSlots.includes(s));
+    res.json({ slots: availableSlots, bookedCount: appointments.length, maxSlots: slots.length });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// Book an appointment
+exports.bookAppointment = async (req, res) => {
+  const { patientName, age, history, doctorId, date, slotTime } = req.body;
+  try {
+    const doctor = await DoctorBooking.findById(doctorId);
+    if (!doctor) return res.status(404).json({ error: 'Doctor not found' });
+    // Check if slot is available
+    const existing = await Appointment.findOne({ doctorId, date, slotTime });
+    if (existing) return res.status(400).json({ error: 'Slot already booked' });
+    // Queue number
+    const appointments = await Appointment.find({ doctorId, date });
+    const queueNumber = appointments.length + 1;
+    const appointment = new Appointment({
+      patientName,
+      age,
+      history,
+      doctorId,
+      doctorName: doctor.doctorName,
+      date,
+      slotTime,
+      queueNumber
+    });
+    await appointment.save();
+    res.json({ success: true, appointment });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// Get appointments for a patient
+exports.getPatientAppointments = async (req, res) => {
+  const { patientName } = req.query;
+  try {
+    let appointments;
+    if (patientName) {
+      appointments = await Appointment.find({ patientName });
+    } else {
+      appointments = await Appointment.find({});
+    }
+    res.json(appointments);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};

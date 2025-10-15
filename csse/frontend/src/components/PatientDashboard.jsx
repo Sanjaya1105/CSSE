@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AppointmentForm from './Appointment/AppointmentForm';
+import AppointmentSlots from './Appointment/AppointmentSlots';
+import AppointmentList from './Appointment/AppointmentList';
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -24,12 +27,26 @@ const PatientDashboard = () => {
   };
 
   const [doctorBookings, setDoctorBookings] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [slots, setSlots] = useState([]);
+  const [bookedCount, setBookedCount] = useState(0);
+  const [maxSlots, setMaxSlots] = useState(0);
+  const [nextWeekDate, setNextWeekDate] = useState('');
+  const [showSlots, setShowSlots] = useState(false);
+  const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
     fetch('/api/doctors')
       .then(res => res.json())
       .then(data => setDoctorBookings(data));
-  }, []);
+    // Fetch patient appointments
+    if (user && user.name) {
+      fetch(`/api/appointments/patient?patientName=${encodeURIComponent(user.name)}`)
+        .then(res => res.json())
+        .then(data => setAppointments(data));
+    }
+  }, [user]);
 
   if (!user) return null;
 
@@ -66,32 +83,71 @@ const PatientDashboard = () => {
                 <p>{user.idCardNumber}</p>
               </div>
             </div>
-            {/* Doctor Booking Details */}
+            {/* Appointment Booking Section */}
             <div className="mt-8">
-              <h3 className="text-xl font-semibold text-gray-700 mb-4">Doctor Booking Details</h3>
-              <table className="w-full border">
-                <thead>
-                  <tr className="bg-gray-200">
-                    <th className="border px-2 py-1">Doctor Name</th>
-                    <th className="border px-2 py-1">Room No</th>
-                    <th className="border px-2 py-1">Day</th>
-                    <th className="border px-2 py-1">Start Time</th>
-                    <th className="border px-2 py-1">End Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {doctorBookings.map(doc => (
-                    <tr key={doc._id}>
-                      <td className="border px-2 py-1">{doc.doctorName}</td>
-                      <td className="border px-2 py-1">{doc.roomNo}</td>
-                      <td className="border px-2 py-1">{doc.bookingDay}</td>
-                      <td className="border px-2 py-1">{doc.startTime}</td>
-                      <td className="border px-2 py-1">{doc.endTime}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <h3 className="text-xl font-semibold text-gray-700 mb-4">Book an Appointment</h3>
+              <AppointmentForm
+                doctors={doctorBookings}
+                onBook={async (form) => {
+                  setSelectedDoctor(form.doctorId);
+                  setSelectedDate(form.date);
+                  // Fetch available slots
+                  const res = await fetch(`/api/appointments/slots?doctorId=${form.doctorId}&date=${form.date}`);
+                  const data = await res.json();
+                  setSlots(data.slots);
+                  setBookedCount(data.bookedCount);
+                  setMaxSlots(data.maxSlots);
+                  // Calculate next week date
+                  if (data.slots.length === 0) {
+                    const d = new Date(form.date);
+                    d.setDate(d.getDate() + 7);
+                    setNextWeekDate(d.toISOString().slice(0,10));
+                  } else {
+                    setNextWeekDate('');
+                  }
+                  setShowSlots(true);
+                }}
+              />
+              {showSlots && (
+                <AppointmentSlots
+                  slots={slots}
+                  onSelect={async (slot, queueNumber) => {
+                    // Book appointment
+                    const doctor = doctorBookings.find(d => d._id === selectedDoctor);
+                    const res = await fetch('/api/appointments/book', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        patientName: user.name,
+                        age: user.age,
+                        history: '',
+                        doctorId: selectedDoctor,
+                        doctorName: doctor.doctorName,
+                        date: selectedDate,
+                        slotTime: slot
+                      })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                      alert(`Appointment booked! Your number: ${queueNumber}, Time: ${slot}`);
+                      setShowSlots(false);
+                      // Refresh appointments
+                      fetch(`/api/appointments/patient?patientName=${encodeURIComponent(user.name)}`)
+                        .then(res => res.json())
+                        .then(data => setAppointments(data));
+                    } else {
+                      alert(data.error || 'Booking failed');
+                    }
+                  }}
+                  bookedCount={bookedCount}
+                  maxSlots={maxSlots}
+                  nextWeekDate={nextWeekDate}
+                />
+              )}
             </div>
+
+            {/* Patient's Appointments List */}
+            <AppointmentList appointments={appointments} />
           </div>
         </div>
       </div>

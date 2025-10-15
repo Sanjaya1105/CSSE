@@ -36,8 +36,12 @@ app.use('/api/login', require('./routes/loginRoutes'));
 // Super Admin routes
 app.use('/api/superadmin', require('./routes/superAdminRoutes'));
 
+
 // Doctor CRUD routes
 app.use('/api/doctors', require('./routes/doctorRoutes'));
+
+// Appointment booking routes
+app.use('/api/appointments', require('./routes/appointmentRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

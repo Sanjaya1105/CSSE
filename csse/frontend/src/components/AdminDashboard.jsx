@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DoctorForm from './Doctor/DoctorForm';
 import DoctorTable from './Doctor/DoctorTable';
 import ScheduleGrid from './Doctor/ScheduleGrid';
+import AdminAppointmentTable from './AdminAppointment/AdminAppointmentTable';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -164,6 +165,9 @@ const AdminDashboard = () => {
             <h3 className="text-lg font-semibold mb-4 text-gray-700">All Doctor Bookings</h3>
             <DoctorTable doctors={doctors} onEdit={handleEdit} onDelete={handleDelete} />
           </div>
+
+          {/* Appointment Details Table */}
+          <AdminAppointmentTable />
         </div>
       </div>
     </div>
