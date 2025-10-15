@@ -196,7 +196,7 @@ const PatientDashboard = () => {
               <div className="bg-gray-50 p-6 rounded-lg border-2 border-purple-200 mb-4">
                 <div className="flex justify-center mb-4">
                   <QRCodeSVG 
-                    value={`http://localhost:5000/api/patient/${user._id || user.idCardNumber}`}
+                    value={user._id || user.idCardNumber}
                     size={200}
                     level="H"
                     includeMargin={true}
@@ -205,9 +205,9 @@ const PatientDashboard = () => {
                 
                 <div className="text-left space-y-2">
                   <div className="bg-white p-3 rounded-lg shadow-sm">
-                    <p className="text-sm font-semibold text-gray-600">QR Code URL:</p>
+                    <p className="text-sm font-semibold text-gray-600">QR Code Contains:</p>
                     <p className="text-xs font-mono text-gray-900 break-all">
-                      POST http://localhost:5000/api/patient/{user._id || user.idCardNumber}
+                      Patient ID Only
                     </p>
                   </div>
                   <div className="bg-white p-3 rounded-lg shadow-sm">
@@ -225,9 +225,17 @@ const PatientDashboard = () => {
                 </div>
               </div>
 
-              <p className="text-sm text-gray-600 mb-4">
-                Scan this QR code to send a lookup request to the doctor's dashboard
-              </p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-gray-700 mb-2">
+                  <strong>📱 How to use this QR Code:</strong>
+                </p>
+                <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
+                  <li><strong>QR Code contains:</strong> Patient ID only (not a full URL)</li>
+                  <li><strong>For Doctor:</strong> Scan and send to <code className="bg-gray-200 px-1 rounded">/api/patient/{'<scanned_id>'}</code></li>
+                  <li><strong>For Admin:</strong> Scan and send to <code className="bg-gray-200 px-1 rounded">/api/patient/adminview/{'<scanned_id>'}</code></li>
+                  <li className="text-blue-700 font-semibold">The scanning system should append the ID to the appropriate endpoint</li>
+                </ul>
+              </div>
 
               <button
                 className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition font-semibold w-full"

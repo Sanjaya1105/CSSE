@@ -130,17 +130,30 @@ const AdminDashboard = () => {
       .then(data => setDoctors(data));
   };
 
+  // Navigate to patient scanner
+  const handleViewPatients = () => {
+    navigate('/admin-patient-scanner');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <nav className="bg-white shadow-md rounded-b-xl">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-3xl font-bold text-blue-600">Admin Dashboard</h1>
-          <button
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleViewPatients}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold"
+            >
+              View Patients
+            </button>
+            <button
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </nav>
 

@@ -7,6 +7,7 @@ import NurseDashboard from './components/NurseDashboard'
 import SuperAdminDashboard from './components/SuperAdminDashboard'
 import AdminDashboard from './components/AdminDashboard'
 import PatientScanner from './components/PatientScanner'
+import AdminPatientScanner from './components/AdminPatientScanner'
 import './App.css'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/superadmin-dashboard" element={<SuperAdminDashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/patient-scanner" element={<PatientScanner />} />
+          <Route path="/admin-patient-scanner" element={<AdminPatientScanner />} />
         </Routes>
       </div>
     </Router>

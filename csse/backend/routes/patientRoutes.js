@@ -1,7 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const { getPatientById, getPendingRequests, clearPendingRequest } = require('../controllers/patientController');
+const { 
+  getPatientById, 
+  getPendingRequests, 
+  clearPendingRequest,
+  getPatientByIdForAdmin,
+  getAdminPendingRequests,
+  clearAdminPendingRequest
+} = require('../controllers/patientController');
 
+// Admin-specific routes (must be before /:id routes to avoid conflicts)
+// Get pending admin patient requests
+router.get('/admin/pending/requests', getAdminPendingRequests);
+
+// Clear an admin pending request
+router.delete('/admin/pending/:requestId', clearAdminPendingRequest);
+
+// Admin patient lookup
+router.post('/adminview/:id', getPatientByIdForAdmin);
+router.get('/adminview/:id', getPatientByIdForAdmin);
+
+// Doctor-specific routes
 // Get pending patient requests
 router.get('/pending/requests', getPendingRequests);
 
