@@ -47,6 +47,9 @@ app.use('/api/appointments', require('./routes/appointmentRoutes'));
 // Channel routes for doctor channeling
 app.use('/api/channel', require('./routes/channelRoutes'));
 
+// Patient routes
+app.use('/api/patient', require('./routes/patientRoutes'));
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

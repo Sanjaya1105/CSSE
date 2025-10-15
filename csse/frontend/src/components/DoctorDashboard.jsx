@@ -26,7 +26,7 @@ const DoctorDashboard = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/appointments/doctor?registerNumber=${parsedUser.registerNumber}`);
+        const res = await fetch(`http://localhost:5000/api/appointments/doctor?registerNumber=${parsedUser.registerNumber}`);
         if (!res.ok) throw new Error('Failed to fetch appointments');
         const data = await res.json();
         setAppointments(data);
@@ -45,6 +45,10 @@ const DoctorDashboard = () => {
     navigate('/login');
   };
 
+  const handleViewPatient = () => {
+    navigate('/patient-scanner');
+  };
+
   if (!user) return null;
 
   return (
@@ -52,12 +56,20 @@ const DoctorDashboard = () => {
       <nav className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-green-600">Hospital Management</h1>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-          >
-            Logout
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handleViewPatient}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+            >
+              View Patient
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </nav>
 
