@@ -9,6 +9,7 @@ import AdminDashboard from './components/AdminDashboard'
 import PatientScanner from './components/PatientScanner'
 import AdminPatientScanner from './components/AdminPatientScanner'
 import AddMedicalRecord from './components/AddMedicalRecord'
+import MyMedicalRecords from './components/MyMedicalRecords'
 import './App.css'
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/patient-scanner" element={<PatientScanner />} />
           <Route path="/admin-patient-scanner" element={<AdminPatientScanner />} />
           <Route path="/add-medical-record" element={<AddMedicalRecord />} />
+          <Route path="/my-medical-records" element={<MyMedicalRecords />} />
         </Routes>
       </div>
     </Router>

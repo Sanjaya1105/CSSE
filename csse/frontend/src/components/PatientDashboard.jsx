@@ -88,13 +88,19 @@ const PatientDashboard = () => {
               </div>
             </div>
 
-            {/* Generate QR Code Button */}
-            <div className="mt-6">
+            {/* Action Buttons */}
+            <div className="mt-6 flex gap-4">
               <button
                 className="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-purple-700 transition font-semibold"
                 onClick={() => setShowQRCode(true)}
               >
                 Generate QR Code
+              </button>
+              <button
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition font-semibold"
+                onClick={() => navigate('/my-medical-records')}
+              >
+                My Medical Records
               </button>
             </div>
             {/* Show Available Doctors Button */}
