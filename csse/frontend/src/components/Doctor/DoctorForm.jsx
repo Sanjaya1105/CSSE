@@ -14,7 +14,8 @@ const DoctorForm = ({ form, onChange, onSubmit, onClose, editId }) => (
       <form onSubmit={onSubmit} className="grid grid-cols-1 gap-4">
         <input name="doctorId" value={form.doctorId} onChange={onChange} placeholder="Doctor ID" required className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
         <input name="doctorName" value={form.doctorName} onChange={onChange} placeholder="Doctor Name" required className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
-        <input name="roomNo" value={form.roomNo} onChange={onChange} placeholder="Room No" required className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+    <input name="roomNo" value={form.roomNo} onChange={onChange} placeholder="Room No" required className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+    <input name="specialization" value={form.specialization || ''} onChange={onChange} placeholder="Specialization" required className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-200" />
         <select name="bookingDay" value={form.bookingDay} onChange={onChange} className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
           {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(day => (
             <option key={day} value={day}>{day}</option>

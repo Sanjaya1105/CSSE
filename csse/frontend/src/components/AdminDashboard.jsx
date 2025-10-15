@@ -14,7 +14,7 @@ const AdminDashboard = () => {
   };
 
   // Doctor CRUD state
-  const initialForm = { doctorId: '', doctorName: '', roomNo: '', bookingDay: 'Monday', startTime: '', endTime: '' };
+  const initialForm = { doctorId: '', doctorName: '', roomNo: '', specialization: '', bookingDay: 'Monday', startTime: '', endTime: '' };
   const [doctors, setDoctors] = React.useState([]);
   const [searchRoom, setSearchRoom] = React.useState('');
   const [filteredDoctors, setFilteredDoctors] = React.useState([]);
@@ -55,6 +55,7 @@ const AdminDashboard = () => {
       doctorId: form.doctorId,
       doctorName: form.doctorName,
       roomNo: form.roomNo,
+      specialization: form.specialization,
       bookingDay: form.bookingDay,
       startTime: form.startTime,
       endTime: form.endTime
@@ -87,6 +88,7 @@ const AdminDashboard = () => {
       doctorId: doctor.doctorId || '',
       doctorName: doctor.doctorName || '',
       roomNo: doctor.roomNo || '',
+      specialization: doctor.specialization || '',
       bookingDay: doctor.bookingDay || 'Monday',
       startTime: doctor.startTime || '',
       endTime: doctor.endTime || ''

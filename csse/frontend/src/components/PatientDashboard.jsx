@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AppointmentForm from './Appointment/AppointmentForm';
 import AppointmentSlots from './Appointment/AppointmentSlots';
 import AppointmentList from './Appointment/AppointmentList';
+import AvailableDoctors from './Appointment/AvailableDoctors';
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const PatientDashboard = () => {
   };
 
   const [doctorBookings, setDoctorBookings] = useState([]);
+  const [showDoctors, setShowDoctors] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
   const [slots, setSlots] = useState([]);
@@ -82,6 +84,18 @@ const PatientDashboard = () => {
                 <p className="font-semibold">ID Card Number:</p>
                 <p>{user.idCardNumber}</p>
               </div>
+            </div>
+            {/* Show Available Doctors Button */}
+            <div className="mt-8">
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition mb-4"
+                onClick={() => setShowDoctors(!showDoctors)}
+              >
+                {showDoctors ? 'Hide Available Doctors' : 'Show Available Doctors'}
+              </button>
+              {showDoctors && (
+                <AvailableDoctors doctors={doctorBookings} />
+              )}
             </div>
             {/* Appointment Booking Section */}
             <div className="mt-8">

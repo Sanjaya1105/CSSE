@@ -6,7 +6,8 @@ const DoctorTable = ({ doctors, onEdit, onDelete }) => (
       <tr className="bg-gray-200">
         <th className="border px-2 py-2">Doctor ID</th>
         <th className="border px-2 py-2">Doctor Name</th>
-        <th className="border px-2 py-2">Room No</th>
+  <th className="border px-2 py-2">Room No</th>
+  <th className="border px-2 py-2">Specialization</th>
         <th className="border px-2 py-2">Booking Day</th>
         <th className="border px-2 py-2">Start Time</th>
         <th className="border px-2 py-2">End Time</th>
@@ -19,6 +20,7 @@ const DoctorTable = ({ doctors, onEdit, onDelete }) => (
           <td className="border px-2 py-2">{doc.doctorId}</td>
           <td className="border px-2 py-2 font-semibold text-blue-700">{doc.doctorName}</td>
           <td className="border px-2 py-2">{doc.roomNo}</td>
+          <td className="border px-2 py-2">{doc.specialization}</td>
           <td className="border px-2 py-2">{doc.bookingDay}</td>
           <td className="border px-2 py-2">{doc.startTime}</td>
           <td className="border px-2 py-2">{doc.endTime}</td>
