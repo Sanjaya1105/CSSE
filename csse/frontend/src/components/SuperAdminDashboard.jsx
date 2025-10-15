@@ -118,6 +118,10 @@ const SuperAdminDashboard = () => {
     navigate('/login');
   };
 
+  const handleViewAllUsers = () => {
+    navigate('/view-all-users');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
@@ -254,6 +258,12 @@ const SuperAdminDashboard = () => {
           onClick={handleCreateAdminClick}
         >
           Create Admin
+        </button>
+        <button
+          className="px-4 py-2 bg-purple-600 text-white rounded"
+          onClick={handleViewAllUsers}
+        >
+          View All Users
         </button>
         <button
           className="px-4 py-2 bg-gray-600 text-white rounded"

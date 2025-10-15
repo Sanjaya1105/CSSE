@@ -7,7 +7,9 @@ const {
   deleteAdmin,
   getPendingDoctors,
   approveDoctor,
-  rejectDoctor
+  rejectDoctor,
+  getAllUsers,
+  deleteUser
 } = require('../controllers/superAdminController');
 const router = express.Router();
 
@@ -18,5 +20,7 @@ router.post('/delete-admin', deleteAdmin);
 router.get('/pending-doctors', getPendingDoctors);
 router.post('/approve-doctor', approveDoctor);
 router.post('/reject-doctor', rejectDoctor);
+router.get('/all-users', getAllUsers);
+router.delete('/delete-user', deleteUser);
 
 module.exports = router;
