@@ -32,6 +32,11 @@ const doctorSchema = new mongoose.Schema({
     required: [true, 'Please add register number'],
     unique: true
   },
+  channelingFee: {
+    type: Number,
+    default: null,
+    min: [0, 'Fee cannot be negative']
+  },
   userType: {
     type: String,
     default: 'doctor'
@@ -46,4 +51,3 @@ const doctorSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('Doctor', doctorSchema);
-
