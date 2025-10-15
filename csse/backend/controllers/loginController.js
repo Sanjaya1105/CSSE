@@ -45,6 +45,27 @@ const loginUser = async (req, res) => {
         return res.status(401).json({ success: false, message: 'Invalid email or password' });
       }
     }
+
+    // Admin login
+    if (email) {
+      const Admin = require('../models/Admin');
+      const admin = await Admin.findOne({ email });
+      if (admin) {
+        const isPasswordMatch = await bcrypt.compare(password, admin.password);
+        if (isPasswordMatch) {
+          return res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            data: {
+              user: { email: admin.email },
+              userType: 'admin'
+            }
+          });
+        } else {
+          return res.status(401).json({ success: false, message: 'Invalid email or password' });
+        }
+      }
+    }
     // Search in all three collections
     let user = null;
     let userType = null;

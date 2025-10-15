@@ -5,6 +5,7 @@ import PatientDashboard from './components/PatientDashboard'
 import DoctorDashboard from './components/DoctorDashboard'
 import NurseDashboard from './components/NurseDashboard'
 import SuperAdminDashboard from './components/SuperAdminDashboard'
+import AdminDashboard from './components/AdminDashboard'
 import './App.css'
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
           <Route path="/nurse-dashboard" element={<NurseDashboard />} />
           <Route path="/superadmin-dashboard" element={<SuperAdminDashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
         </Routes>
       </div>
     </Router>

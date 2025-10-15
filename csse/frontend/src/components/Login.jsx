@@ -51,6 +51,8 @@ const Login = () => {
             navigate('/nurse-dashboard');
           } else if (data.data.userType === 'superadmin') {
             navigate('/superadmin-dashboard');
+          } else if (data.data.userType === 'admin') {
+            navigate('/admin-dashboard');
           }
         }, 1000);
       } else {
