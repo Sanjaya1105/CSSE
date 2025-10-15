@@ -1,3 +1,18 @@
+// Get appointments for a doctor by register number (doctorId field)
+exports.getDoctorAppointments = async (req, res) => {
+  const { registerNumber } = req.query;
+  try {
+    if (!registerNumber) return res.status(400).json({ error: 'registerNumber required' });
+    // Find doctor by register number
+    const doctor = await DoctorBooking.findOne({ doctorId: registerNumber });
+    if (!doctor) return res.status(404).json({ error: 'Doctor not found' });
+    // Find appointments for this doctor
+    const appointments = await Appointment.find({ doctorId: doctor._id });
+    res.json(appointments);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 const Appointment = require('../models/Appointment');
 const DoctorBooking = require('../models/DoctorBooking');
 
@@ -46,6 +61,7 @@ exports.bookAppointment = async (req, res) => {
       history,
       doctorId,
       doctorName: doctor.doctorName,
+      doctorRegisterNumber: doctor.doctorId, // Add register number
       date,
       slotTime,
       queueNumber

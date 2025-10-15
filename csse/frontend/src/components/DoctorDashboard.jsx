@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DoctorAppointmentTable from './DoctorDashboard/DoctorAppointmentTable';
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const userType = localStorage.getItem('userType');
@@ -14,7 +18,25 @@ const DoctorDashboard = () => {
       return;
     }
 
-    setUser(JSON.parse(userData));
+    const parsedUser = JSON.parse(userData);
+    setUser(parsedUser);
+
+    // Fetch appointments for this doctor by register number
+    const fetchAppointments = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/appointments/doctor?registerNumber=${parsedUser.registerNumber}`);
+        if (!res.ok) throw new Error('Failed to fetch appointments');
+        const data = await res.json();
+        setAppointments(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAppointments();
   }, [navigate]);
 
   const handleLogout = () => {
@@ -40,9 +62,8 @@ const DoctorDashboard = () => {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
           <h2 className="text-4xl font-bold text-gray-800 mb-6">Doctor</h2>
-          
           <div className="border-t pt-6">
             <h3 className="text-xl font-semibold text-gray-700 mb-4">Welcome, Dr. {user.name}!</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-600">
@@ -65,6 +86,8 @@ const DoctorDashboard = () => {
             </div>
           </div>
         </div>
+
+        <DoctorAppointmentTable appointments={appointments} loading={loading} error={error} />
       </div>
     </div>
   );
