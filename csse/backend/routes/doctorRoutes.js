@@ -12,7 +12,5 @@ router.get('/', doctorController.getDoctors);
 router.put('/:id', doctorController.updateDoctor);
 // Delete doctor
 router.delete('/:id', doctorController.deleteDoctor);
-// Set channeling fee
-router.put('/:id/channeling-fee', doctorController.setChannelingFee);
 
 module.exports = router;

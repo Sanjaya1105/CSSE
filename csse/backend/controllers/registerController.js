@@ -12,9 +12,9 @@ const registerUser = async (req, res) => {
 
     // Validate user type
     if (!['patient', 'doctor', 'staff'].includes(userType)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid user type'
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid user type' 
       });
     }
 
@@ -24,9 +24,9 @@ const registerUser = async (req, res) => {
     const existingStaff = await Staff.findOne({ email });
 
     if (existingPatient || existingDoctor || existingStaff) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email already registered'
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Email already registered' 
       });
     }
 
@@ -52,8 +52,7 @@ const registerUser = async (req, res) => {
           ...otherData,
           email,
           password: hashedPassword,
-          userType: 'doctor',
-          channelingFee: null  // default null when registering
+          userType: 'doctor'
         });
         break;
 
@@ -79,28 +78,28 @@ const registerUser = async (req, res) => {
 
   } catch (error) {
     console.error('Registration error:', error);
-
+    
     // Handle validation errors
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({
-        success: false,
-        message: messages.join(', ')
+      return res.status(400).json({ 
+        success: false, 
+        message: messages.join(', ') 
       });
     }
 
     // Handle duplicate key errors
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
-      return res.status(400).json({
-        success: false,
-        message: `${field} already exists`
+      return res.status(400).json({ 
+        success: false, 
+        message: `${field} already exists` 
       });
     }
 
-    res.status(500).json({
-      success: false,
-      message: 'Server error during registration'
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error during registration' 
     });
   }
 };
