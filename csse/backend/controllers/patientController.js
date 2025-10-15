@@ -190,12 +190,50 @@ const clearAdminPendingRequest = async (req, res) => {
   }
 };
 
+// @desc    Search patients by name or ID card number
+// @route   GET /api/patient/search?query=searchTerm
+// @access  Private (Admin)
+const searchPatients = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        message: 'Search query is required'
+      });
+    }
+
+    // Search by name (case-insensitive) or ID card number
+    const patients = await Patient.find({
+      $or: [
+        { name: { $regex: query, $options: 'i' } },
+        { idCardNumber: { $regex: query, $options: 'i' } }
+      ]
+    }).select('-password').limit(10);
+
+    res.status(200).json({
+      success: true,
+      count: patients.length,
+      data: patients
+    });
+
+  } catch (error) {
+    console.error('Search patients error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while searching patients'
+    });
+  }
+};
+
 module.exports = { 
   getPatientById, 
   getPendingRequests, 
   clearPendingRequest,
   getPatientByIdForAdmin,
   getAdminPendingRequests,
-  clearAdminPendingRequest
+  clearAdminPendingRequest,
+  searchPatients
 };
 

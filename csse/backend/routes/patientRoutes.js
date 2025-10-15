@@ -6,8 +6,12 @@ const {
   clearPendingRequest,
   getPatientByIdForAdmin,
   getAdminPendingRequests,
-  clearAdminPendingRequest
+  clearAdminPendingRequest,
+  searchPatients
 } = require('../controllers/patientController');
+
+// Search patients (must be before /:id routes to avoid conflicts)
+router.get('/search', searchPatients);
 
 // Admin-specific routes (must be before /:id routes to avoid conflicts)
 // Get pending admin patient requests

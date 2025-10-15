@@ -135,6 +135,11 @@ const AdminDashboard = () => {
     navigate('/admin-patient-scanner');
   };
 
+  // Navigate to QR generator
+  const handleGenerateQR = () => {
+    navigate('/generate-qr-for-patient');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <nav className="bg-white shadow-md rounded-b-xl">
@@ -146,6 +151,12 @@ const AdminDashboard = () => {
               className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold"
             >
               View Patients
+            </button>
+            <button
+              onClick={handleGenerateQR}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold"
+            >
+              Generate QR for Patient
             </button>
             <button
               className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
