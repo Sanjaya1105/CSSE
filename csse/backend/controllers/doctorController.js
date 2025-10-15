@@ -1,4 +1,15 @@
 const DoctorBooking = require('../models/DoctorBooking');
+const Doctor = require('../models/Doctor');
+
+// Get all approved doctors (accounts)
+exports.getApprovedDoctors = async (req, res) => {
+  try {
+    const approvedDoctors = await Doctor.find({ status: 'approved' }, '-password');
+    res.json(approvedDoctors);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // Create a new doctor booking
 exports.createDoctor = async (req, res) => {

@@ -80,6 +80,19 @@ const loginUser = async (req, res) => {
     if (!user) {
       user = await Doctor.findOne({ email });
       if (user) {
+        // Check if doctor account is approved
+        if (user.status === 'pending') {
+          return res.status(403).json({
+            success: false,
+            message: 'Your account is pending approval by the Super Admin'
+          });
+        }
+        if (user.status === 'rejected') {
+          return res.status(403).json({
+            success: false,
+            message: 'Your account has been rejected'
+          });
+        }
         userType = 'doctor';
       }
     }

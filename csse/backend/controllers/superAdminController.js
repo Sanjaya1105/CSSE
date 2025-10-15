@@ -63,4 +63,67 @@ const resetSuperAdminPassword = async (req, res) => {
   }
 };
 
-module.exports = { resetSuperAdminPassword, createAdmin, getAllAdmins, deleteAdmin };
+// Get all pending doctors
+const getPendingDoctors = async (req, res) => {
+  try {
+    const Doctor = require('../models/Doctor');
+    const doctors = await Doctor.find({ status: 'pending' }, '-password');
+    res.status(200).json({ success: true, doctors });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// Approve a doctor
+const approveDoctor = async (req, res) => {
+  const { doctorId } = req.body;
+  if (!doctorId) {
+    return res.status(400).json({ success: false, message: 'Doctor ID required' });
+  }
+  try {
+    const Doctor = require('../models/Doctor');
+    const doctor = await Doctor.findByIdAndUpdate(
+      doctorId,
+      { status: 'approved' },
+      { new: true }
+    );
+    if (!doctor) {
+      return res.status(404).json({ success: false, message: 'Doctor not found' });
+    }
+    res.status(200).json({ success: true, message: 'Doctor approved successfully', doctor });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// Reject a doctor
+const rejectDoctor = async (req, res) => {
+  const { doctorId } = req.body;
+  if (!doctorId) {
+    return res.status(400).json({ success: false, message: 'Doctor ID required' });
+  }
+  try {
+    const Doctor = require('../models/Doctor');
+    const doctor = await Doctor.findByIdAndUpdate(
+      doctorId,
+      { status: 'rejected' },
+      { new: true }
+    );
+    if (!doctor) {
+      return res.status(404).json({ success: false, message: 'Doctor not found' });
+    }
+    res.status(200).json({ success: true, message: 'Doctor rejected successfully', doctor });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+module.exports = { 
+  resetSuperAdminPassword, 
+  createAdmin, 
+  getAllAdmins, 
+  deleteAdmin,
+  getPendingDoctors,
+  approveDoctor,
+  rejectDoctor
+};

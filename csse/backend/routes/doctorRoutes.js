@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const doctorController = require('../controllers/doctorController');
 
+// Get approved doctors (accounts)
+router.get('/approved', doctorController.getApprovedDoctors);
 // Create doctor
 router.post('/', doctorController.createDoctor);
 // Get all doctors

@@ -16,6 +16,7 @@ const AdminDashboard = () => {
   // Doctor CRUD state
   const initialForm = { doctorId: '', doctorName: '', roomNo: '', specialization: '', bookingDay: 'Monday', startTime: '', endTime: '' };
   const [doctors, setDoctors] = React.useState([]);
+  const [approvedDoctors, setApprovedDoctors] = React.useState([]);
   const [searchRoom, setSearchRoom] = React.useState('');
   const [filteredDoctors, setFilteredDoctors] = React.useState([]);
   const [showSchedule, setShowSchedule] = React.useState(false);
@@ -23,13 +24,21 @@ const AdminDashboard = () => {
   const [editId, setEditId] = React.useState(null);
   const [showForm, setShowForm] = React.useState(false);
 
-  // Fetch doctors
+  // Fetch doctors and approved doctor accounts
   React.useEffect(() => {
-    fetch('/api/doctors')
+    // Fetch doctor bookings
+    fetch('http://localhost:5000/api/doctors')
       .then(res => res.json())
       .then(data => {
         setDoctors(data);
         setFilteredDoctors(data);
+      });
+    
+    // Fetch approved doctor accounts
+    fetch('http://localhost:5000/api/doctors/approved')
+      .then(res => res.json())
+      .then(data => {
+        setApprovedDoctors(data);
       });
   }, []);
 
@@ -40,6 +49,22 @@ const AdminDashboard = () => {
     } else {
       setFilteredDoctors(doctors.filter(doc => doc.roomNo === searchRoom.trim()));
       setShowSchedule(true);
+    }
+  };
+
+  // Handle doctor selection from dropdown
+  const handleDoctorSelect = (e) => {
+    const selectedDoctorId = e.target.value;
+    if (!selectedDoctorId) return;
+    
+    const selectedDoctor = approvedDoctors.find(doc => doc._id === selectedDoctorId);
+    if (selectedDoctor) {
+      setForm({
+        ...form,
+        doctorId: selectedDoctor.registerNumber,
+        doctorName: selectedDoctor.name,
+        specialization: selectedDoctor.specialization
+      });
     }
   };
 
@@ -61,13 +86,13 @@ const AdminDashboard = () => {
       endTime: form.endTime
     };
     if (editId) {
-      await fetch(`/api/doctors/${editId}`, {
+      await fetch(`http://localhost:5000/api/doctors/${editId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
     } else {
-      await fetch('/api/doctors', {
+      await fetch('http://localhost:5000/api/doctors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -77,7 +102,7 @@ const AdminDashboard = () => {
     setEditId(null);
     setShowForm(false);
     // Refresh list
-    fetch('/api/doctors')
+    fetch('http://localhost:5000/api/doctors')
       .then(res => res.json())
       .then(data => setDoctors(data));
   };
@@ -99,8 +124,8 @@ const AdminDashboard = () => {
 
   // Delete doctor
   const handleDelete = async id => {
-    await fetch(`/api/doctors/${id}`, { method: 'DELETE' });
-    fetch('/api/doctors')
+    await fetch(`http://localhost:5000/api/doctors/${id}`, { method: 'DELETE' });
+    fetch('http://localhost:5000/api/doctors')
       .then(res => res.json())
       .then(data => setDoctors(data));
   };
@@ -121,12 +146,12 @@ const AdminDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Doctor Management</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Doctor Booking Management</h2>
           <button
             className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition mb-6"
             onClick={() => { setShowForm(true); setForm(initialForm); setEditId(null); }}
           >
-            Add Doctor
+            Add Doctor Booking
           </button>
 
           {/* Add/Edit Doctor Modal Card */}
@@ -137,6 +162,8 @@ const AdminDashboard = () => {
               onSubmit={handleSubmit}
               onClose={() => { setShowForm(false); setEditId(null); }}
               editId={editId}
+              approvedDoctors={approvedDoctors}
+              onDoctorSelect={handleDoctorSelect}
             />
           )}
 
