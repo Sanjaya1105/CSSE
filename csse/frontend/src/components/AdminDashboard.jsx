@@ -1,5 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import DoctorForm from './Doctor/DoctorForm';
+import DoctorTable from './Doctor/DoctorTable';
+import ScheduleGrid from './Doctor/ScheduleGrid';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -125,31 +128,13 @@ const AdminDashboard = () => {
 
           {/* Add/Edit Doctor Modal Card */}
           {showForm && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-              <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-fade-in">
-                <button
-                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl"
-                  onClick={() => { setShowForm(false); setEditId(null); }}
-                  title="Close"
-                >
-                  &times;
-                </button>
-                <h3 className="text-xl font-bold mb-4 text-blue-700">{editId ? 'Edit Doctor' : 'Add Doctor'}</h3>
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
-                  <input name="doctorId" value={form.doctorId} onChange={handleChange} placeholder="Doctor ID" required className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                  <input name="doctorName" value={form.doctorName} onChange={handleChange} placeholder="Doctor Name" required className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                  <input name="roomNo" value={form.roomNo} onChange={handleChange} placeholder="Room No" required className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                  <select name="bookingDay" value={form.bookingDay} onChange={handleChange} className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
-                    {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(day => (
-                      <option key={day} value={day}>{day}</option>
-                    ))}
-                  </select>
-                  <input name="startTime" value={form.startTime} onChange={handleChange} placeholder="Start Time (e.g. 09:00)" required className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                  <input name="endTime" value={form.endTime} onChange={handleChange} placeholder="End Time (e.g. 17:00)" required className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
-                  <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">{editId ? 'Update' : 'Add'} Doctor</button>
-                </form>
-              </div>
-            </div>
+            <DoctorForm
+              form={form}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+              onClose={() => { setShowForm(false); setEditId(null); }}
+              editId={editId}
+            />
           )}
 
           {/* Room Number Search */}
@@ -172,85 +157,12 @@ const AdminDashboard = () => {
 
           {/* Weekly Schedule Grid: Only show after clicking Search */}
           {showSchedule && (
-            <div className="overflow-x-auto mb-8">
-              <h3 className="text-lg font-semibold mb-4 text-blue-700">Weekly Doctor Schedule</h3>
-              <table className="border w-full min-w-[700px] rounded-xl overflow-hidden shadow">
-                <thead>
-                  <tr className="bg-blue-100">
-                    <th className="border px-2 py-2">Hour</th>
-                    {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(day => (
-                      <th key={day} className="border px-2 py-2">{day}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.from({length: 12}, (_, i) => i+8).map(hour => {
-                    const hourStr = hour.toString().padStart(2, '0') + ':00';
-                    return (
-                      <tr key={hourStr}>
-                        <td className="border px-2 py-2 font-semibold bg-gray-50">{hourStr}</td>
-                        {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(day => {
-                          // Find doctor for this day and hour
-                          const doc = filteredDoctors.find(d => {
-                            if (d.bookingDay !== day) return false;
-                            // Compare hour with startTime and endTime
-                            const start = parseInt(d.startTime.split(':')[0], 10);
-                            const end = parseInt(d.endTime.split(':')[0], 10);
-                            return hour >= start && hour < end;
-                          });
-                          return (
-                            <td
-                              key={day+hourStr}
-                              className={doc ? "border px-2 py-2 bg-red-500 text-white font-bold rounded-lg shadow" : "border px-2 py-2 bg-white"}
-                            >
-                              {doc ? (
-                                <div>
-                                  <span className="block text-sm">{doc.doctorName}</span>
-                                  <span className="block text-xs">Room: {doc.roomNo}</span>
-                                </div>
-                              ) : ''}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <ScheduleGrid filteredDoctors={filteredDoctors} />
           )}
 
           <div className="mt-8">
             <h3 className="text-lg font-semibold mb-4 text-gray-700">All Doctor Bookings</h3>
-            <table className="w-full border rounded-xl overflow-hidden shadow">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="border px-2 py-2">Doctor ID</th>
-                  <th className="border px-2 py-2">Doctor Name</th>
-                  <th className="border px-2 py-2">Room No</th>
-                  <th className="border px-2 py-2">Booking Day</th>
-                  <th className="border px-2 py-2">Start Time</th>
-                  <th className="border px-2 py-2">End Time</th>
-                  <th className="border px-2 py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {doctors.map(doc => (
-                  <tr key={doc._id} className="hover:bg-blue-50">
-                    <td className="border px-2 py-2">{doc.doctorId}</td>
-                    <td className="border px-2 py-2 font-semibold text-blue-700">{doc.doctorName}</td>
-                    <td className="border px-2 py-2">{doc.roomNo}</td>
-                    <td className="border px-2 py-2">{doc.bookingDay}</td>
-                    <td className="border px-2 py-2">{doc.startTime}</td>
-                    <td className="border px-2 py-2">{doc.endTime}</td>
-                    <td className="border px-2 py-2">
-                      <button className="bg-yellow-500 text-white px-3 py-1 rounded-lg shadow mr-2 hover:bg-yellow-600 transition" onClick={() => handleEdit(doc)}>Edit</button>
-                      <button className="bg-red-600 text-white px-3 py-1 rounded-lg shadow hover:bg-red-700 transition" onClick={() => handleDelete(doc._id)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <DoctorTable doctors={doctors} onEdit={handleEdit} onDelete={handleDelete} />
           </div>
         </div>
       </div>
