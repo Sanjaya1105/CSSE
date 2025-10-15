@@ -1,6 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ChannelPopup from './ChannelPopup';
 
 const DoctorAppointmentTable = ({ appointments, loading, error }) => {
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [doneChannels, setDoneChannels] = useState([]);
+
+  const handleChannelClick = (appt) => {
+    setSelectedAppointment(appt);
+  };
+
+  const handleClosePopup = () => {
+    setSelectedAppointment(null);
+    setSaveError(null);
+  };
+
+  const handleSaveChannel = async (formData) => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const res = await fetch('/api/channel/save', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Save failed');
+      setSelectedAppointment(null);
+      // Mark channel as done for this appointment
+      setDoneChannels(prev => [...prev, formData.get('appointmentId')]);
+    } catch (err) {
+      setSaveError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Appointments</h2>
@@ -21,6 +56,7 @@ const DoctorAppointmentTable = ({ appointments, loading, error }) => {
                 <th className="py-2 px-4 border-b">Date</th>
                 <th className="py-2 px-4 border-b">Time</th>
                 <th className="py-2 px-4 border-b">Queue No</th>
+                <th className="py-2 px-4 border-b">Channel</th>
               </tr>
             </thead>
             <tbody>
@@ -32,11 +68,32 @@ const DoctorAppointmentTable = ({ appointments, loading, error }) => {
                   <td className="py-2 px-4 border-b">{appt.date}</td>
                   <td className="py-2 px-4 border-b">{appt.slotTime}</td>
                   <td className="py-2 px-4 border-b">{appt.queueNumber}</td>
+                  <td className="py-2 px-4 border-b">
+                    {doneChannels.includes(appt._id) ? (
+                      <span className="px-3 py-1 bg-gray-300 text-green-700 rounded">Done</span>
+                    ) : (
+                      <button
+                        className="px-3 py-1 bg-emerald-500 text-white rounded hover:bg-emerald-600"
+                        onClick={() => handleChannelClick(appt)}
+                      >
+                        Channel
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+      {selectedAppointment && (
+        <ChannelPopup
+          appointment={selectedAppointment}
+          onClose={handleClosePopup}
+          onSave={handleSaveChannel}
+          saving={saving}
+          error={saveError}
+        />
       )}
     </div>
   );
