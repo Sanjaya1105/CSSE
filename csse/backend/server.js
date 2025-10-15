@@ -16,6 +16,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files (uploaded reports)
+app.use('/uploads', express.static('uploads'));
+
 // Routes
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Hospital Management System API' });
@@ -49,6 +52,9 @@ app.use('/api/channel', require('./routes/channelRoutes'));
 
 // Patient routes
 app.use('/api/patient', require('./routes/patientRoutes'));
+
+// Medical records routes
+app.use('/api/medical-records', require('./routes/medicalRecordRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

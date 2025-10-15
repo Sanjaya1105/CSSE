@@ -1,14 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const PatientScanner = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [patientData, setPatientData] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [pendingRequest, setPendingRequest] = useState(null);
   const [isListening, setIsListening] = useState(true);
   const [lastChecked, setLastChecked] = useState(new Date().toLocaleTimeString());
+  const [showMedicalRecords, setShowMedicalRecords] = useState(false);
+  const [medicalRecords, setMedicalRecords] = useState([]);
+  const [loadingRecords, setLoadingRecords] = useState(false);
   const pollingInterval = useRef(null);
+
+  // Check if returning from medical record submission
+  useEffect(() => {
+    if (location.state?.returnToPatient && location.state?.patientData) {
+      setPatientData(location.state.patientData);
+      setIsListening(false);
+      // Clear the state to prevent re-triggering
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   // Poll for pending patient requests
   useEffect(() => {
@@ -93,6 +107,31 @@ const PatientScanner = () => {
   const handleClear = () => {
     setPatientData(null);
     setIsListening(true);
+    setShowMedicalRecords(false);
+    setMedicalRecords([]);
+  };
+
+  // Load patient's medical records
+  const handleViewMedicalRecords = async () => {
+    if (!patientData || !patientData._id) return;
+    
+    setLoadingRecords(true);
+    try {
+      const response = await fetch(`http://localhost:5000/api/medical-records/patient/${patientData._id}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setMedicalRecords(data.data);
+        setShowMedicalRecords(true);
+      } else {
+        alert('Failed to load medical records');
+      }
+    } catch (error) {
+      console.error('Error loading medical records:', error);
+      alert('Error loading medical records');
+    } finally {
+      setLoadingRecords(false);
+    }
   };
 
   return (
@@ -201,12 +240,27 @@ const PatientScanner = () => {
               <h2 className="text-3xl font-bold text-gray-800">
                 Patient Details
               </h2>
-              <button
-                onClick={handleClear}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
-              >
-                Scan Another
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => navigate('/add-medical-record', { state: { patientData } })}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold"
+                >
+                  Add Medical Record
+                </button>
+                <button
+                  onClick={handleViewMedicalRecords}
+                  disabled={loadingRecords}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold disabled:bg-gray-400"
+                >
+                  {loadingRecords ? 'Loading...' : 'Past Medical Records'}
+                </button>
+                <button
+                  onClick={handleClear}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+                >
+                  Scan Another
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -335,6 +389,136 @@ const PatientScanner = () => {
                   Yes
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Medical Records Modal */}
+      {showMedicalRecords && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-5xl max-h-[90vh] overflow-y-auto relative">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-3xl font-bold"
+              onClick={() => setShowMedicalRecords(false)}
+              title="Close"
+            >
+              &times;
+            </button>
+
+            <div className="mb-6">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                Past Medical Records
+              </h2>
+              <p className="text-sm text-gray-600">
+                Patient: <span className="font-semibold">{patientData?.name}</span>
+              </p>
+            </div>
+
+            {medicalRecords.length === 0 ? (
+              <div className="text-center py-12">
+                <svg
+                  className="w-16 h-16 mx-auto text-gray-400 mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                <p className="text-gray-500 text-lg">No medical records found for this patient</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {medicalRecords.map((record, index) => (
+                  <div
+                    key={record._id}
+                    className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-800">
+                          Record #{medicalRecords.length - index}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {new Date(record.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
+                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                        Age: {record.age}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-red-50 p-3 rounded-lg">
+                        <p className="text-sm font-semibold text-red-600 mb-1">Diagnosis</p>
+                        <p className="text-gray-800 whitespace-pre-wrap">{record.diagnosis}</p>
+                      </div>
+
+                      <div className="bg-blue-50 p-3 rounded-lg">
+                        <p className="text-sm font-semibold text-blue-600 mb-1">Medicines</p>
+                        <p className="text-gray-800 whitespace-pre-wrap">{record.medicines}</p>
+                      </div>
+
+                      {record.recommendation && (
+                        <div className="bg-purple-50 p-3 rounded-lg md:col-span-2">
+                          <p className="text-sm font-semibold text-purple-600 mb-1">Recommendation</p>
+                          <p className="text-gray-800 whitespace-pre-wrap">{record.recommendation}</p>
+                        </div>
+                      )}
+
+                      {record.reportUrl && (
+                        <div className="bg-yellow-50 p-3 rounded-lg">
+                          <p className="text-sm font-semibold text-yellow-600 mb-1">Report</p>
+                          <a
+                            href={`http://localhost:5000${record.reportUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline flex items-center gap-1"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            View Report PDF
+                          </a>
+                        </div>
+                      )}
+
+                      {record.nextDate && (
+                        <div className="bg-green-50 p-3 rounded-lg">
+                          <p className="text-sm font-semibold text-green-600 mb-1">Next Appointment</p>
+                          <p className="text-gray-800 font-semibold">
+                            {new Date(record.nextDate).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowMedicalRecords(false)}
+                className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
