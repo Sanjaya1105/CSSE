@@ -1,6 +1,7 @@
+
 import React from 'react';
 
-const ScheduleGrid = ({ filteredDoctors }) => (
+const ScheduleGrid = ({ filteredDoctors, onSlotClick }) => (
   <div className="overflow-x-auto mb-8">
     <h3 className="text-lg font-semibold mb-4 text-blue-700">Weekly Doctor Schedule</h3>
     <table className="border w-full min-w-[700px] rounded-xl overflow-hidden shadow">
@@ -25,15 +26,23 @@ const ScheduleGrid = ({ filteredDoctors }) => (
                   const end = parseInt(d.endTime.split(':')[0], 10);
                   return hour >= start && hour < end;
                 });
+                let slotColor = "bg-red-500";
+                let nurseName = "";
+                if (doc && doc.nurse) {
+                  slotColor = "bg-green-500";
+                  nurseName = doc.nurse.name;
+                }
                 return (
                   <td
                     key={day+hourStr}
-                    className={doc ? "border px-2 py-2 bg-red-500 text-white font-bold rounded-lg shadow" : "border px-2 py-2 bg-white"}
+                    className={doc ? `border px-2 py-2 ${slotColor} text-white font-bold rounded-lg shadow cursor-pointer` : "border px-2 py-2 bg-white"}
+                    onClick={() => doc && onSlotClick && onSlotClick(doc)}
                   >
                     {doc ? (
                       <div>
                         <span className="block text-sm">{doc.doctorName}</span>
                         <span className="block text-xs">Room: {doc.roomNo}</span>
+                        {nurseName && <span className="block text-xs mt-1">Nurse: {nurseName}</span>}
                       </div>
                     ) : ''}
                   </td>

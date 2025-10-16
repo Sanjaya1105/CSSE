@@ -7,6 +7,7 @@ import NurseDashboard from './components/NurseDashboard'
 import SuperAdminDashboard from './components/SuperAdminDashboard'
 import AdminDashboard from './components/AdminDashboard'
 import './App.css'
+import StaffTable from './components/Staff/StaffTable';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/nurse-dashboard" element={<NurseDashboard />} />
           <Route path="/superadmin-dashboard" element={<SuperAdminDashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/staff-management" element={<StaffTable />} />
         </Routes>
       </div>
     </Router>

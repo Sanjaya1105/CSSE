@@ -43,6 +43,11 @@ const AdminDashboard = () => {
     }
   };
 
+  // Staff management navigation
+  const handleManageStaff = () => {
+    navigate('/staff-management');
+  }
+
   // Handle form change
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -163,9 +168,21 @@ const AdminDashboard = () => {
             <ScheduleGrid filteredDoctors={filteredDoctors} />
           )}
 
+
           <div className="mt-8">
             <h3 className="text-lg font-semibold mb-4 text-gray-700">All Doctor Bookings</h3>
             <DoctorTable doctors={doctors} onEdit={handleEdit} onDelete={handleDelete} />
+          </div>
+
+          {/* Manage Staff Button */}
+          <div className="mt-8">
+            <button
+              type="button"
+              className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition"
+              onClick={handleManageStaff}
+            >
+              Manage Staff
+            </button>
           </div>
 
           {/* Appointment Details Table */}

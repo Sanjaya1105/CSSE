@@ -36,8 +36,16 @@ app.use('/api/login', require('./routes/loginRoutes'));
 // Super Admin routes
 app.use('/api/superadmin', require('./routes/superAdminRoutes'));
 
+app.use('/api/doctor-nurse-assignment', require('./routes/doctorNurseAssignmentRoutes'));
+
 
 // Doctor CRUD routes
+
+// Staff routes
+app.use('/api/staff', require('./routes/staffRoutes'));
+
+// Room schedule routes
+app.use('/api/room-schedule', require('./routes/roomScheduleRoutes'));
 app.use('/api/doctors', require('./routes/doctorRoutes'));
 
 

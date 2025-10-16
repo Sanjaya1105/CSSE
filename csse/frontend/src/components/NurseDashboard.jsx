@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const NurseDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [schedule, setSchedule] = useState([]);
 
   useEffect(() => {
     const userType = localStorage.getItem('userType');
@@ -16,6 +17,17 @@ const NurseDashboard = () => {
 
     setUser(JSON.parse(userData));
   }, [navigate]);
+
+  useEffect(() => {
+    // Fetch nurse's schedule from backend
+    if (user && user._id) {
+      fetch(`/api/doctor-nurse-assignment?nurseId=${user._id}`)
+        .then(res => res.json())
+        .then(data => {
+          setSchedule(Array.isArray(data) ? data : []);
+        });
+    }
+  }, [user]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -58,6 +70,36 @@ const NurseDashboard = () => {
                 <p className="font-semibold">Register Number:</p>
                 <p>{user.registerNumber}</p>
               </div>
+            </div>
+            {/* Nurse's schedule section */}
+            <div className="mt-8">
+              <h4 className="text-2xl font-bold text-blue-700 mb-4">Your Schedule</h4>
+              {schedule.length === 0 ? (
+                <p className="text-gray-500">No schedule found for you.</p>
+              ) : (
+                <table className="w-full text-md bg-blue-50 rounded-xl overflow-hidden shadow">
+                  <thead className="bg-blue-200">
+                    <tr>
+                      <th className="p-3">Room</th>
+                      <th className="p-3">Doctor</th>
+                      <th className="p-3">Week Start</th>
+                      <th className="p-3">Week End</th>
+                      <th className="p-3">Time Slot</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {schedule.map((item, idx) => (
+                      <tr key={item._id || idx} className="hover:bg-blue-100 transition">
+                        <td className="p-3">{item.roomNo}</td>
+                        <td className="p-3">{item.doctorName}</td>
+                        <td className="p-3">{item.weekStartDay}</td>
+                        <td className="p-3">{item.weekEndDay}</td>
+                        <td className="p-3">{item.timeSlot}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>
