@@ -277,15 +277,25 @@ const Register = () => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Specialization
                 </label>
-                <input
-                  type="text"
+                <select
                   name="specialization"
                   value={formData.specialization}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                  placeholder="Enter specialization"
                   required
-                />
+                >
+                  <option value="">Select specialization</option>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Dermatology">Dermatology</option>
+                  <option value="Neurology">Neurology</option>
+                  <option value="Pediatrics">Pediatrics</option>
+                  <option value="Orthopedics">Orthopedics</option>
+                  <option value="Gynecology">Gynecology</option>
+                  <option value="Ophthalmology">Ophthalmology</option>
+                  <option value="Psychiatry">Psychiatry</option>
+                  <option value="General Medicine">General Medicine</option>
+                  <option value="Surgery">Surgery</option>
+                </select>
               </div>
             </div>
           )}

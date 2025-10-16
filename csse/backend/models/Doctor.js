@@ -35,6 +35,11 @@ const doctorSchema = new mongoose.Schema({
   userType: {
     type: String,
     default: 'doctor'
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
   }
 }, {
   timestamps: true

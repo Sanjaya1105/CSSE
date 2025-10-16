@@ -6,6 +6,12 @@ import DoctorDashboard from './components/DoctorDashboard'
 import NurseDashboard from './components/NurseDashboard'
 import SuperAdminDashboard from './components/SuperAdminDashboard'
 import AdminDashboard from './components/AdminDashboard'
+import PatientScanner from './components/PatientScanner'
+import AdminPatientScanner from './components/AdminPatientScanner'
+import AddMedicalRecord from './components/AddMedicalRecord'
+import MyMedicalRecords from './components/MyMedicalRecords'
+import GenerateQRForPatient from './components/GenerateQRForPatient'
+import ViewAllUsers from './components/ViewAllUsers'
 import './App.css'
 import StaffTable from './components/Staff/StaffTable';
 
@@ -22,6 +28,12 @@ function App() {
           <Route path="/nurse-dashboard" element={<NurseDashboard />} />
           <Route path="/superadmin-dashboard" element={<SuperAdminDashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/patient-scanner" element={<PatientScanner />} />
+          <Route path="/admin-patient-scanner" element={<AdminPatientScanner />} />
+          <Route path="/add-medical-record" element={<AddMedicalRecord />} />
+          <Route path="/my-medical-records" element={<MyMedicalRecords />} />
+          <Route path="/generate-qr-for-patient" element={<GenerateQRForPatient />} />
+          <Route path="/view-all-users" element={<ViewAllUsers />} />
           <Route path="/staff-management" element={<StaffTable />} />
         </Routes>
       </div>

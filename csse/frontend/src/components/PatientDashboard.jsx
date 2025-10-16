@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
 import AppointmentForm from './Appointment/AppointmentForm';
 import AppointmentSlots from './Appointment/AppointmentSlots';
 import AppointmentList from './Appointment/AppointmentList';
@@ -37,14 +38,15 @@ const PatientDashboard = () => {
   const [nextWeekDate, setNextWeekDate] = useState('');
   const [showSlots, setShowSlots] = useState(false);
   const [appointments, setAppointments] = useState([]);
+  const [showQRCode, setShowQRCode] = useState(false);
 
   useEffect(() => {
-    fetch('/api/doctors')
+    fetch('http://localhost:5000/api/doctors')
       .then(res => res.json())
       .then(data => setDoctorBookings(data));
     // Fetch patient appointments
     if (user && user.name) {
-      fetch(`/api/appointments/patient?patientName=${encodeURIComponent(user.name)}`)
+      fetch(`http://localhost:5000/api/appointments/patient?patientName=${encodeURIComponent(user.name)}`)
         .then(res => res.json())
         .then(data => setAppointments(data));
     }
@@ -85,6 +87,22 @@ const PatientDashboard = () => {
                 <p>{user.idCardNumber}</p>
               </div>
             </div>
+
+            {/* Action Buttons */}
+            <div className="mt-6 flex gap-4">
+              <button
+                className="bg-purple-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-purple-700 transition font-semibold"
+                onClick={() => setShowQRCode(true)}
+              >
+                Generate QR Code
+              </button>
+              <button
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition font-semibold"
+                onClick={() => navigate('/my-medical-records')}
+              >
+                My Medical Records
+              </button>
+            </div>
             {/* Show Available Doctors Button */}
             <div className="mt-8">
               <button
@@ -106,7 +124,7 @@ const PatientDashboard = () => {
                   setSelectedDoctor(form.doctorId);
                   setSelectedDate(form.date);
                   // Fetch available slots
-                  const res = await fetch(`/api/appointments/slots?doctorId=${form.doctorId}&date=${form.date}`);
+                  const res = await fetch(`http://localhost:5000/api/appointments/slots?doctorId=${form.doctorId}&date=${form.date}`);
                   const data = await res.json();
                   setSlots(data.slots);
                   setBookedCount(data.bookedCount);
@@ -128,7 +146,7 @@ const PatientDashboard = () => {
                   onSelect={async (slot, queueNumber) => {
                     // Book appointment
                     const doctor = doctorBookings.find(d => d._id === selectedDoctor);
-                    const res = await fetch('/api/appointments/book', {
+                    const res = await fetch('http://localhost:5000/api/appointments/book', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
@@ -146,7 +164,7 @@ const PatientDashboard = () => {
                       alert(`Appointment booked! Your number: ${queueNumber}, Time: ${slot}`);
                       setShowSlots(false);
                       // Refresh appointments
-                      fetch(`/api/appointments/patient?patientName=${encodeURIComponent(user.name)}`)
+                      fetch(`http://localhost:5000/api/appointments/patient?patientName=${encodeURIComponent(user.name)}`)
                         .then(res => res.json())
                         .then(data => setAppointments(data));
                     } else {
@@ -165,6 +183,76 @@ const PatientDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* QR Code Modal */}
+      {showQRCode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-fade-in">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-3xl font-bold"
+              onClick={() => setShowQRCode(false)}
+              title="Close"
+            >
+              &times;
+            </button>
+            
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-purple-700 mb-4">Patient QR Code</h3>
+              
+              <div className="bg-gray-50 p-6 rounded-lg border-2 border-purple-200 mb-4">
+                <div className="flex justify-center mb-4">
+                  <QRCodeSVG 
+                    value={user._id || user.idCardNumber}
+                    size={200}
+                    level="H"
+                    includeMargin={true}
+                  />
+                </div>
+                
+                <div className="text-left space-y-2">
+                  <div className="bg-white p-3 rounded-lg shadow-sm">
+                    <p className="text-sm font-semibold text-gray-600">QR Code Contains:</p>
+                    <p className="text-xs font-mono text-gray-900 break-all">
+                      Patient ID Only
+                    </p>
+                  </div>
+                  <div className="bg-white p-3 rounded-lg shadow-sm">
+                    <p className="text-sm font-semibold text-gray-600">Patient ID:</p>
+                    <p className="text-lg font-mono text-gray-900">{user._id || user.idCardNumber}</p>
+                  </div>
+                  <div className="bg-white p-3 rounded-lg shadow-sm">
+                    <p className="text-sm font-semibold text-gray-600">Name:</p>
+                    <p className="text-lg text-gray-900">{user.name}</p>
+                  </div>
+                  <div className="bg-white p-3 rounded-lg shadow-sm">
+                    <p className="text-sm font-semibold text-gray-600">ID Card Number:</p>
+                    <p className="text-lg text-gray-900">{user.idCardNumber}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-gray-700 mb-2">
+                  <strong>📱 How to use this QR Code:</strong>
+                </p>
+                <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
+                  <li><strong>QR Code contains:</strong> Patient ID only (not a full URL)</li>
+                  <li><strong>For Doctor:</strong> Scan and send to <code className="bg-gray-200 px-1 rounded">/api/patient/{'<scanned_id>'}</code></li>
+                  <li><strong>For Admin:</strong> Scan and send to <code className="bg-gray-200 px-1 rounded">/api/patient/adminview/{'<scanned_id>'}</code></li>
+                  <li className="text-blue-700 font-semibold">The scanning system should append the ID to the appropriate endpoint</li>
+                </ul>
+              </div>
+
+              <button
+                className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition font-semibold w-full"
+                onClick={() => setShowQRCode(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
