@@ -1,1 +1,23 @@
 node_modules/
+
+# Environment
+.env
+
+# Uploaded files (do not commit user uploads)
+uploads/
+
+# Logs
+logs/
+
+# Build artifacts
+dist/
+build/
+
+# Caches
+.cache/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
