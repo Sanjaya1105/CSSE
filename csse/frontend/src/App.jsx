@@ -14,6 +14,10 @@ import GenerateQRForPatient from './components/GenerateQRForPatient'
 import ViewAllUsers from './components/ViewAllUsers'
 import './App.css'
 import StaffTable from './components/Staff/StaffTable';
+import PaymentMethodSelection from './components/PaymentMethodSelection'
+import CardPayment from './components/Payment/CardPayment'
+import GovernmentPayment from './components/Payment/GovernmentPayment'
+import InsurancePayment from './components/Payment/InsurancePayment'
 
 function App() {
   return (
@@ -35,6 +39,10 @@ function App() {
           <Route path="/generate-qr-for-patient" element={<GenerateQRForPatient />} />
           <Route path="/view-all-users" element={<ViewAllUsers />} />
           <Route path="/staff-management" element={<StaffTable />} />
+          <Route path="/payment-method-selection" element={<PaymentMethodSelection />} />
+          <Route path="/payment/card" element={<CardPayment />} />
+          <Route path="/payment/government" element={<GovernmentPayment />} />
+          <Route path="/payment/insurance" element={<InsurancePayment />} />
         </Routes>
       </div>
     </Router>

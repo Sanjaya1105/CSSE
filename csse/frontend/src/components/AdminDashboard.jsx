@@ -150,12 +150,12 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <nav className="bg-white shadow-md rounded-b-xl">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+        <div className="flex flex-col items-center justify-between px-4 py-4 mx-auto max-w-7xl md:flex-row">
           <div className="flex items-center gap-4 mb-4 md:mb-0">
             <img
               src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
               alt="Hospital"
-              className="w-24 h-24 object-cover rounded-2xl shadow-lg border-4 border-blue-200 animate-fade-in"
+              className="object-cover w-24 h-24 border-4 border-blue-200 shadow-lg rounded-2xl animate-fade-in"
               style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}
             />
             <h1 className="text-3xl font-bold text-blue-600 drop-shadow-lg">Admin Dashboard</h1>
@@ -163,18 +163,18 @@ const AdminDashboard = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={handleViewPatients}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold"
+              className="px-4 py-2 font-semibold text-white transition bg-purple-600 rounded-lg hover:bg-purple-700"
             >
               View Patients
             </button>
             <button
               onClick={handleGenerateQR}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold"
+              className="px-4 py-2 font-semibold text-white transition bg-indigo-600 rounded-lg hover:bg-indigo-700"
             >
               Generate QR for Patient
             </button>
             <button
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+              className="px-4 py-2 text-white transition bg-gray-600 rounded-lg hover:bg-gray-700"
               onClick={handleLogout}
             >
               Logout
@@ -183,16 +183,16 @@ const AdminDashboard = () => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-8">
+      <div className="flex flex-col gap-8 px-4 py-8 mx-auto max-w-7xl">
         {/* Section 1: Doctor Booking Management */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border-l-8 border-blue-400">
-          <h2 className="text-2xl font-bold text-blue-700 mb-6">Doctor Booking Management</h2>
-          <div className="flex flex-col md:flex-row gap-8">
+        <div className="p-8 bg-white border-l-8 border-blue-400 shadow-xl rounded-2xl">
+          <h2 className="mb-6 text-2xl font-bold text-blue-700">Doctor Booking Management</h2>
+          <div className="flex flex-col gap-8 md:flex-row">
             {/* Add Doctor Booking */}
-            <div className="flex-1 bg-blue-50 rounded-xl p-6 shadow mb-6">
-              <h3 className="text-lg font-semibold text-blue-600 mb-4">Add Doctor Booking</h3>
+            <div className="flex-1 p-6 mb-6 shadow bg-blue-50 rounded-xl">
+              <h3 className="mb-4 text-lg font-semibold text-blue-600">Add Doctor Booking</h3>
               <button
-                className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition mb-4"
+                className="px-4 py-2 mb-4 text-white transition bg-green-500 rounded-lg shadow hover:bg-green-600"
                 onClick={() => { setShowForm(true); setForm(initialForm); setEditId(null); }}
               >
                 Add Doctor Booking
@@ -210,11 +210,11 @@ const AdminDashboard = () => {
               )}
             </div>
             {/* All Doctor Bookings */}
-            <div className="flex-1 bg-blue-50 rounded-xl p-6 shadow mb-6">
-              <h3 className="text-lg font-semibold text-blue-600 mb-4">All Doctor Bookings</h3>
+            <div className="flex-1 p-6 mb-6 shadow bg-blue-50 rounded-xl">
+              <h3 className="mb-4 text-lg font-semibold text-blue-600">All Doctor Bookings</h3>
               <button
                 type="button"
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition mb-4"
+                className="px-4 py-2 mb-4 text-white transition bg-blue-500 rounded-lg shadow hover:bg-blue-600"
                 onClick={() => setShowDoctorTable((prev) => !prev)}
               >
                 {showDoctorTable ? 'Hide Table' : 'Show Table'}
@@ -224,19 +224,19 @@ const AdminDashboard = () => {
               )}
             </div>
             {/* Room Search & Weekly Schedule */}
-            <div className="flex-1 bg-blue-50 rounded-xl p-6 shadow mb-6">
-              <h3 className="text-lg font-semibold text-blue-600 mb-4">Room Search & Weekly Schedule</h3>
-              <div className="mb-4 flex gap-2 items-center">
+            <div className="flex-1 p-6 mb-6 shadow bg-blue-50 rounded-xl">
+              <h3 className="mb-4 text-lg font-semibold text-blue-600">Room Search & Weekly Schedule</h3>
+              <div className="flex items-center gap-2 mb-4">
                 <input
                   type="text"
                   value={searchRoom}
                   onChange={e => setSearchRoom(e.target.value)}
                   placeholder="Search Room Number"
-                  className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  className="px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />
                 <button
                   type="button"
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition"
+                  className="px-4 py-2 text-white transition bg-blue-500 rounded-lg shadow hover:bg-blue-600"
                   onClick={handleSearchRoom}
                 >
                   Search
@@ -250,11 +250,11 @@ const AdminDashboard = () => {
         </div>
 
         {/* Section 2: Staff Management */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border-l-8 border-green-400">
-          <h2 className="text-2xl font-bold text-green-700 mb-6">Staff Management</h2>
+        <div className="p-8 bg-white border-l-8 border-green-400 shadow-xl rounded-2xl">
+          <h2 className="mb-6 text-2xl font-bold text-green-700">Staff Management</h2>
           <button
             type="button"
-            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition"
+            className="px-4 py-2 text-white transition bg-green-500 rounded-lg shadow hover:bg-green-600"
             onClick={handleManageStaff}
           >
             Manage Staff
@@ -262,14 +262,14 @@ const AdminDashboard = () => {
         </div>
 
         {/* Section 3: Appointment Management */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border-l-8 border-purple-400">
-          <h2 className="text-2xl font-bold text-purple-700 mb-6">Appointment Management</h2>
+        <div className="p-8 bg-white border-l-8 border-purple-400 shadow-xl rounded-2xl">
+          <h2 className="mb-6 text-2xl font-bold text-purple-700">Appointment Management</h2>
           <AdminAppointmentTable />
         </div>
 
         {/* Section 4: Doctor Weekly Report */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border-l-8 border-yellow-400">
-          <h2 className="text-2xl font-bold text-yellow-700 mb-6">Doctor Weekly Report</h2>
+        <div className="p-8 bg-white border-l-8 border-yellow-400 shadow-xl rounded-2xl">
+          <h2 className="mb-6 text-2xl font-bold text-yellow-700">Doctor Weekly Report</h2>
           <DoctorWeeklyReport />
         </div>
       </div>

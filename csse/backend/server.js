@@ -64,6 +64,8 @@ app.use('/api/patient', require('./routes/patientRoutes'));
 // Medical records routes
 app.use('/api/medical-records', require('./routes/medicalRecordRoutes'));
 
+// Add payment routes
+app.use('/api/payments', require('./routes/paymentRoutes'));
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

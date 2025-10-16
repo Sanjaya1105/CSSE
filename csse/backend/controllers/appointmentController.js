@@ -1,3 +1,22 @@
+// Get appointments for a doctor by register number (doctorId field)
+exports.getDoctorAppointments = async (req, res) => {
+  const { registerNumber } = req.query;
+  try {
+    if (!registerNumber) return res.status(400).json({ error: 'registerNumber required' });
+    // Find doctor by register number
+    const doctor = await DoctorBooking.findOne({ doctorId: registerNumber });
+    if (!doctor) return res.status(404).json({ error: 'Doctor not found' });
+    // Find appointments for this doctor
+    const appointments = await Appointment.find({ doctorId: doctor._id });
+    res.json(appointments);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+
+
 // Get all appointments
 exports.getAllAppointments = async (req, res) => {
   try {
@@ -56,11 +75,25 @@ exports.getAvailableSlots = async (req, res) => {
 exports.bookAppointment = async (req, res) => {
   const { patientName, age, history, doctorId, date, slotTime } = req.body;
   try {
+    console.log('Booking appointment with data:', { patientName, age, history, doctorId, date, slotTime });
+    
+    if (!doctorId || !patientName || !age || !date || !slotTime) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
     const doctor = await DoctorBooking.findById(doctorId);
-    if (!doctor) return res.status(404).json({ error: 'Doctor not found' });
+    if (!doctor) {
+      console.log('Doctor not found with id:', doctorId);
+      return res.status(404).json({ error: 'Doctor not found' });
+    }
+    
     // Check if slot is available
     const existing = await Appointment.findOne({ doctorId, date, slotTime });
-    if (existing) return res.status(400).json({ error: 'Slot already booked' });
+    if (existing) {
+      console.log('Slot already booked:', { doctorId, date, slotTime });
+      return res.status(400).json({ error: 'Slot already booked' });
+    }
+    
     // Queue number
     const appointments = await Appointment.find({ doctorId, date });
     const queueNumber = appointments.length + 1;
@@ -78,7 +111,8 @@ exports.bookAppointment = async (req, res) => {
     await appointment.save();
     res.json({ success: true, appointment });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Error booking appointment:', err);
+    res.status(500).json({ error: 'Server error: ' + err.message });
   }
 };
 
