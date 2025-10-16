@@ -23,6 +23,7 @@ const AdminDashboard = () => {
   const [form, setForm] = React.useState(initialForm);
   const [editId, setEditId] = React.useState(null);
   const [showForm, setShowForm] = React.useState(false);
+  const [showDoctorTable, setShowDoctorTable] = React.useState(false);
 
   // Fetch doctors and approved doctor accounts
   React.useEffect(() => {
@@ -148,8 +149,16 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <nav className="bg-white shadow-md rounded-b-xl">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-blue-600">Admin Dashboard</h1>
+        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+          <div className="flex items-center gap-4 mb-4 md:mb-0">
+            <img
+              src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+              alt="Hospital"
+              className="w-24 h-24 object-cover rounded-2xl shadow-lg border-4 border-blue-200 animate-fade-in"
+              style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}
+            />
+            <h1 className="text-3xl font-bold text-blue-600 drop-shadow-lg">Admin Dashboard</h1>
+          </div>
           <div className="flex items-center gap-3">
             <button
               onClick={handleViewPatients}
@@ -173,70 +182,87 @@ const AdminDashboard = () => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Doctor Booking Management</h2>
+      <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-8">
+        {/* Section 1: Doctor Booking Management */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border-l-8 border-blue-400">
+          <h2 className="text-2xl font-bold text-blue-700 mb-6">Doctor Booking Management</h2>
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Add Doctor Booking */}
+            <div className="flex-1 bg-blue-50 rounded-xl p-6 shadow mb-6">
+              <h3 className="text-lg font-semibold text-blue-600 mb-4">Add Doctor Booking</h3>
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition mb-4"
+                onClick={() => { setShowForm(true); setForm(initialForm); setEditId(null); }}
+              >
+                Add Doctor Booking
+              </button>
+              {showForm && (
+                <DoctorForm
+                  form={form}
+                  onChange={handleChange}
+                  onSubmit={handleSubmit}
+                  onClose={() => { setShowForm(false); setEditId(null); }}
+                  editId={editId}
+                  approvedDoctors={approvedDoctors}
+                  onDoctorSelect={handleDoctorSelect}
+                />
+              )}
+            </div>
+            {/* All Doctor Bookings */}
+            <div className="flex-1 bg-blue-50 rounded-xl p-6 shadow mb-6">
+              <h3 className="text-lg font-semibold text-blue-600 mb-4">All Doctor Bookings</h3>
+              <button
+                type="button"
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition mb-4"
+                onClick={() => setShowDoctorTable((prev) => !prev)}
+              >
+                {showDoctorTable ? 'Hide Table' : 'Show Table'}
+              </button>
+              {showDoctorTable && (
+                <DoctorTable doctors={doctors} onEdit={handleEdit} onDelete={handleDelete} />
+              )}
+            </div>
+            {/* Room Search & Weekly Schedule */}
+            <div className="flex-1 bg-blue-50 rounded-xl p-6 shadow mb-6">
+              <h3 className="text-lg font-semibold text-blue-600 mb-4">Room Search & Weekly Schedule</h3>
+              <div className="mb-4 flex gap-2 items-center">
+                <input
+                  type="text"
+                  value={searchRoom}
+                  onChange={e => setSearchRoom(e.target.value)}
+                  placeholder="Search Room Number"
+                  className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                />
+                <button
+                  type="button"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition"
+                  onClick={handleSearchRoom}
+                >
+                  Search
+                </button>
+              </div>
+              {showSchedule && (
+                <ScheduleGrid filteredDoctors={filteredDoctors} />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Section 2: Staff Management */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border-l-8 border-green-400">
+          <h2 className="text-2xl font-bold text-green-700 mb-6">Staff Management</h2>
           <button
-            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition mb-6"
-            onClick={() => { setShowForm(true); setForm(initialForm); setEditId(null); }}
+            type="button"
+            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition"
+            onClick={handleManageStaff}
           >
-            Add Doctor Booking
+            Manage Staff
           </button>
+        </div>
 
-          {/* Add/Edit Doctor Modal Card */}
-          {showForm && (
-            <DoctorForm
-              form={form}
-              onChange={handleChange}
-              onSubmit={handleSubmit}
-              onClose={() => { setShowForm(false); setEditId(null); }}
-              editId={editId}
-              approvedDoctors={approvedDoctors}
-              onDoctorSelect={handleDoctorSelect}
-            />
-          )}
-
-          {/* Room Number Search */}
-          <div className="mb-6 flex gap-2 items-center">
-            <input
-              type="text"
-              value={searchRoom}
-              onChange={e => setSearchRoom(e.target.value)}
-              placeholder="Search Room Number"
-              className="border px-3 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-            />
-            <button
-              type="button"
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition"
-              onClick={handleSearchRoom}
-            >
-              Search
-            </button>
-          </div>
-
-          {/* Weekly Schedule Grid: Only show after clicking Search */}
-          {showSchedule && (
-            <ScheduleGrid filteredDoctors={filteredDoctors} />
-          )}
-
-
-          <div className="mt-8">
-            <h3 className="text-lg font-semibold mb-4 text-gray-700">All Doctor Bookings</h3>
-            <DoctorTable doctors={doctors} onEdit={handleEdit} onDelete={handleDelete} />
-          </div>
-
-          {/* Manage Staff Button */}
-          <div className="mt-8">
-            <button
-              type="button"
-              className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition"
-              onClick={handleManageStaff}
-            >
-              Manage Staff
-            </button>
-          </div>
-
-          {/* Appointment Details Table */}
+        {/* Section 3: Appointment Management */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border-l-8 border-purple-400">
+          <h2 className="text-2xl font-bold text-purple-700 mb-6">Appointment Management</h2>
           <AdminAppointmentTable />
         </div>
       </div>

@@ -2,7 +2,7 @@ import React from 'react';
 
 const DoctorForm = ({ form, onChange, onSubmit, onClose, editId, approvedDoctors, onDoctorSelect }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-    <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-fade-in">
+    <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl relative animate-fade-in overflow-y-auto" style={{ maxHeight: '90vh' }}>
       <button
         className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl"
         onClick={onClose}
