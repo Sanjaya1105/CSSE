@@ -1,3 +1,12 @@
+// Get all appointments
+exports.getAllAppointments = async (req, res) => {
+  try {
+    const appointments = await Appointment.find();
+    res.json(appointments);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 // Get appointments for a doctor by register number (doctorId field)
 exports.getDoctorAppointments = async (req, res) => {
   const { registerNumber } = req.query;

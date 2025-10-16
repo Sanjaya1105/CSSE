@@ -4,6 +4,7 @@ import DoctorForm from './Doctor/DoctorForm';
 import DoctorTable from './Doctor/DoctorTable';
 import ScheduleGrid from './Doctor/ScheduleGrid';
 import AdminAppointmentTable from './AdminAppointment/AdminAppointmentTable';
+import DoctorWeeklyReport from './Doctor/DoctorWeeklyReport';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -264,6 +265,12 @@ const AdminDashboard = () => {
         <div className="bg-white rounded-2xl shadow-xl p-8 border-l-8 border-purple-400">
           <h2 className="text-2xl font-bold text-purple-700 mb-6">Appointment Management</h2>
           <AdminAppointmentTable />
+        </div>
+
+        {/* Section 4: Doctor Weekly Report */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border-l-8 border-yellow-400">
+          <h2 className="text-2xl font-bold text-yellow-700 mb-6">Doctor Weekly Report</h2>
+          <DoctorWeeklyReport />
         </div>
       </div>
     </div>
