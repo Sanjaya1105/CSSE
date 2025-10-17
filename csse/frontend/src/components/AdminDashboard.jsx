@@ -1,4 +1,6 @@
 import React from 'react';
+import StaffTable from './Staff/StaffTable';
+import SuccessToast from './Staff/SuccessToast';
 import { useNavigate } from 'react-router-dom';
 import DoctorForm from './Doctor/DoctorForm';
 import DoctorTable from './Doctor/DoctorTable';
@@ -9,6 +11,22 @@ import DoctorWeeklyReport from './Doctor/DoctorWeeklyReport';
 import PeakTimesAnalytics from './PeakTimesAnalytics';
 
 const AdminDashboard = () => {
+  // Success notification state for staff schedule
+  const [successMessage, setSuccessMessage] = React.useState('');
+  const successTimeoutRef = React.useRef(null);
+
+  // Show notification for a limited time
+  const handleShowSuccess = (msg) => {
+    setSuccessMessage(msg);
+    if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+    successTimeoutRef.current = setTimeout(() => setSuccessMessage(''), 3000);
+  };
+
+  // Manual close handler
+  const handleCloseSuccess = () => {
+    setSuccessMessage('');
+    if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+  };
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -154,6 +172,8 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Success notification toast for staff schedule */}
+      <SuccessToast message={successMessage} onClose={handleCloseSuccess} />
       <nav className="bg-white shadow-md rounded-b-xl">
         <div className="flex flex-col items-center justify-between px-4 py-4 mx-auto max-w-7xl md:flex-row">
           <div className="flex items-center gap-4 mb-4 md:mb-0">
@@ -269,13 +289,8 @@ const AdminDashboard = () => {
         {/* Section 2: Staff Management */}
         <div className="p-8 bg-white border-l-8 border-green-400 shadow-xl rounded-2xl">
           <h2 className="mb-6 text-2xl font-bold text-green-700">Staff Management</h2>
-          <button
-            type="button"
-            className="px-4 py-2 text-white transition bg-green-500 rounded-lg shadow hover:bg-green-600"
-            onClick={handleManageStaff}
-          >
-            Manage Staff
-          </button>
+          {/* Render StaffTable directly here, passing onShowSuccess */}
+          <StaffTable onShowSuccess={() => handleShowSuccess('Staff schedule saved successfully!')} />
         </div>
 
         {/* Section 3: Appointment Management */}

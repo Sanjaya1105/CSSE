@@ -4,7 +4,7 @@ import NurseModal from './NurseModal';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const StaffTable = () => {
+const StaffTable = ({ onShowSuccess }) => {
   const navigate = useNavigate();
   // Load previous nurse assignments for selected room and week
   const fetchPreviousAssignments = async (room, start, end) => {
@@ -219,7 +219,7 @@ const StaffTable = () => {
           body: JSON.stringify(assignment)
         });
       }
-      alert('All nurse assignments saved successfully!');
+      if (onShowSuccess) onShowSuccess('Schedule saved successfully!');
     } catch (err) {
       alert('Failed to save nurse assignments');
     }
@@ -227,13 +227,8 @@ const StaffTable = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 p-8 flex flex-col items-center">
-      <button
-        className="mb-6 px-6 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-700 transition font-semibold self-start"
-        onClick={() => navigate('/admin-dashboard')}
-      >
-        Go Back to Dashboard
-      </button>
-      <h2 className="text-4xl font-extrabold mb-8 text-blue-700 drop-shadow-lg tracking-wide">Staff List</h2>
+      {/* Go Back to Dashboard button removed as requested */}
+      <h2 className="text-4xl font-extrabold mb-8 text-blue-700 drop-shadow-lg tracking-wide">Staff Schedule</h2>
       <button
         className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition font-semibold"
         onClick={() => setShowStaffTable((prev) => !prev)}
