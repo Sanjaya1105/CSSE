@@ -4,15 +4,22 @@ const doctorController = require('../controllers/doctorController');
 
 // Get approved doctors (accounts)
 router.get('/approved', doctorController.getApprovedDoctors);
+
+// Get doctor by register number (must come before /:id)
+router.get('/register/:registerNumber', doctorController.getDoctorByRegisterNumber);
 // Create doctor
 router.post('/', doctorController.createDoctor);
 // Get all doctors
 router.get('/', doctorController.getDoctors);
+// Get doctor by ID
+router.get('/:id', doctorController.getDoctorById);
 // Update doctor
 router.put('/:id', doctorController.updateDoctor);
 // Update channeling fee
 router.put('/:id/channeling-fee', doctorController.setChannelingFee);
 // Delete doctor
 router.delete('/:id', doctorController.deleteDoctor);
+
+
 
 module.exports = router;

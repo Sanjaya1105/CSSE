@@ -8,7 +8,7 @@ const PaymentDetailsModal = ({ appointmentId, appointmentData, onClose }) => {
   useEffect(() => {
     const fetchPaymentDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/payments/appointment/${appointmentId}`);
+        const response = await fetch(`http://localhost:5000/api/appointments/${appointmentId}/payment-details`);
         if (response.ok) {
           const data = await response.json();
           setPaymentDetails(data);

@@ -4,6 +4,7 @@ import DoctorForm from './Doctor/DoctorForm';
 import DoctorTable from './Doctor/DoctorTable';
 import ScheduleGrid from './Doctor/ScheduleGrid';
 import AdminAppointmentTable from './AdminAppointment/AdminAppointmentTable';
+import PendingAppointmentTable from './AdminAppointment/PendingAppointmentTable';
 
 import DoctorWeeklyReport from './Doctor/DoctorWeeklyReport';
 import PeakTimesAnalytics from './PeakTimesAnalytics';
@@ -281,7 +282,18 @@ const AdminDashboard = () => {
         {/* Section 3: Appointment Management */}
         <div className="p-8 bg-white border-l-8 border-purple-400 shadow-xl rounded-2xl">
           <h2 className="mb-6 text-2xl font-bold text-purple-700">Appointment Management</h2>
-          <AdminAppointmentTable />
+          
+          {/* Pending Appointments Section */}
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold text-yellow-700 mb-4">Pending Appointments (Awaiting Approval)</h3>
+            <PendingAppointmentTable />
+          </div>
+
+          {/* All Appointments Section */}
+          <div>
+            <h3 className="text-xl font-semibold text-purple-700 mb-4">All Appointments</h3>
+            <AdminAppointmentTable />
+          </div>
         </div>
 
         {/* Section 4: Doctor Weekly Report */}

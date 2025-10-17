@@ -50,7 +50,7 @@ const PaymentMethodSelection = () => {
               </div>
               <div className="col-span-2">
                 <p className="font-semibold">Channeling Fee:</p>
-                <p className="text-2xl text-blue-600">${appointmentData.channelingFee?.toFixed(2) || '50.00'}</p>
+                <p className="text-2xl text-blue-600">Rs.{appointmentData.channelingFee?.toFixed(2) || '50.00'}</p>
               </div>
             </div>
           </div>
@@ -71,11 +71,6 @@ const PaymentMethodSelection = () => {
                 <p className="text-gray-600 text-sm mb-4">
                   Pay securely with your credit or debit card
                 </p>
-                <ul className="text-xs text-gray-500 text-left space-y-1">
-                  <li>✓ Instant confirmation</li>
-                  <li>✓ Secure payment processing</li>
-                  <li>✓ All major cards accepted</li>
-                </ul>
                 <button className="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
                   Pay with Card
                 </button>
@@ -93,11 +88,6 @@ const PaymentMethodSelection = () => {
                 <p className="text-gray-600 text-sm mb-4">
                   Use your government healthcare coverage
                 </p>
-                <ul className="text-xs text-gray-500 text-left space-y-1">
-                  <li>✓ No out-of-pocket costs</li>
-                  <li>✓ Medicare/Medicaid accepted</li>
-                  <li>✓ Direct billing</li>
-                </ul>
                 <button className="mt-4 w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
                   Use Government Coverage
                 </button>
@@ -115,11 +105,6 @@ const PaymentMethodSelection = () => {
                 <p className="text-gray-600 text-sm mb-4">
                   Submit a claim to your insurance provider
                 </p>
-                <ul className="text-xs text-gray-500 text-left space-y-1">
-                  <li>✓ Submit insurance claim</li>
-                  <li>✓ Reduced co-payment</li>
-                  <li>✓ Major providers accepted</li>
-                </ul>
                 <button className="mt-4 w-full px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
                   Use Insurance
                 </button>

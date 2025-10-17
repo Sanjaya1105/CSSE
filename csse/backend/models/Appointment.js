@@ -10,7 +10,9 @@ const appointmentSchema = new mongoose.Schema({
   date: { type: String, required: true }, // YYYY-MM-DD
   slotTime: { type: String, required: true }, // e.g. 08:00
   queueNumber: { type: Number, required: true },
-  status: { type: String, default: 'Booked' }
+  status: { type: String, default: 'Pending' },
+  paymentType: { type: String, required: false },
+  paymentId: { type: mongoose.Schema.Types.ObjectId, required: false }
 });
 
 module.exports = mongoose.model('Appointment', appointmentSchema);

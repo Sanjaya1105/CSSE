@@ -17,7 +17,15 @@ const CardPayment = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCardDetails(prev => ({ ...prev, [name]: value }));
+    
+    // Format card number with spaces every 4 digits
+    if (name === 'cardNumber') {
+      const digits = value.replace(/\s/g, '').replace(/\D/g, '');
+      const formatted = digits.match(/.{1,4}/g)?.join(' ') || digits;
+      setCardDetails(prev => ({ ...prev, [name]: formatted }));
+    } else {
+      setCardDetails(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -26,7 +34,7 @@ const CardPayment = () => {
     setError('');
 
     try {
-      // Step 1: Create the appointment
+      // Step 1: Create the appointment with 'Pending' status
       console.log('Sending appointment data:', appointmentData);
       const appointmentRes = await fetch('http://localhost:5000/api/appointments/book', {
         method: 'POST',
@@ -64,6 +72,21 @@ const CardPayment = () => {
       const paymentData = await paymentRes.json();
 
       if (paymentData.clientSecret) {
+        // Step 3: Update appointment status to 'Booked' and link payment
+        const updateRes = await fetch(`http://localhost:5000/api/appointments/${appointmentResponse.appointment._id}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'Booked',
+            paymentType: 'card',
+            paymentId: paymentData.cardPayment._id
+          })
+        });
+
+        if (!updateRes.ok) {
+          throw new Error('Failed to update appointment status');
+        }
+
         alert('Appointment booked successfully! Payment processed.');
         navigate('/patient-dashboard');
       }
@@ -122,53 +145,7 @@ const CardPayment = () => {
               </div>
               <div className="col-span-2">
                 <p className="font-semibold">Amount:</p>
-                <p className="text-2xl text-blue-600">${(appointmentData.channelingFee || 50).toFixed(2)}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Test Card Information */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-semibold text-blue-800 flex items-center">
-                💳 Test Card Information
-              </h4>
-              <button
-                type="button"
-                onClick={() => {
-                  setCardDetails({
-                    cardholderName: 'John Doe',
-                    cardNumber: '4242 4242 4242 4242',
-                    expiryDate: '12/25',
-                    cvv: '123'
-                  });
-                }}
-                className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-              >
-                Auto-Fill Test Data
-              </button>
-            </div>
-            <p className="text-sm text-gray-700 mb-2">
-              Use these test card details for demo/testing purposes:
-            </p>
-            <div className="bg-white p-3 rounded border border-blue-100 text-sm">
-              <div className="grid grid-cols-2 gap-2 text-gray-700">
-                <div>
-                  <span className="font-semibold">Card Number:</span>
-                  <p className="font-mono text-blue-600">4242 4242 4242 4242</p>
-                </div>
-                <div>
-                  <span className="font-semibold">Expiry:</span>
-                  <p className="font-mono text-blue-600">12/25</p>
-                </div>
-                <div>
-                  <span className="font-semibold">CVV:</span>
-                  <p className="font-mono text-blue-600">123</p>
-                </div>
-                <div>
-                  <span className="font-semibold">Name:</span>
-                  <p className="font-mono text-blue-600">Any Name</p>
-                </div>
+                <p className="text-2xl text-blue-600">Rs.{(appointmentData.channelingFee || 50).toFixed(2)}</p>
               </div>
             </div>
           </div>
@@ -264,7 +241,7 @@ const CardPayment = () => {
                 disabled={processing}
                 className="flex-1 px-6 py-3 font-semibold text-white transition bg-blue-500 rounded-lg hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                {processing ? 'Processing...' : `Pay $${(appointmentData.channelingFee || 50).toFixed(2)}`}
+                {processing ? 'Processing...' : `Pay Rs.${(appointmentData.channelingFee || 50).toFixed(2)}`}
               </button>
               <button
                 type="button"

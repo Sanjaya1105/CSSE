@@ -1,0 +1,117 @@
+@startuml Hospital Management System - Simplified Class Diagram
+
+' ==============================================
+' STYLING
+' ==============================================
+skinparam linetype ortho
+skinparam nodesep 80
+skinparam ranksep 80
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FFFFFF
+skinparam class {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    ArrowColor #424242
+}
+
+' ==============================================
+' CORE USER CLASSES
+' ==============================================
+class Patient {
+    - name: String
+    - email: String
+    - idCardNumber: String
+    - age: Number
+    - address: String
+}
+
+class Doctor {
+    - name: String
+    - email: String
+    - specialization: String
+    - registerNumber: String
+    - channelingFee: Number
+    - status: String
+}
+
+class Admin {
+    - email: String
+    - password: String
+}
+
+' ==============================================
+' CORE BUSINESS MODELS
+' ==============================================
+class Appointment {
+    - patientName: String
+    - doctorName: String
+    - date: String
+    - slotTime: String
+    - queueNumber: Number
+    - status: String
+}
+
+class MedicalRecord {
+    - patientId: String
+    - diagnosis: String
+    - medicines: String
+    - recommendation: String
+    - reportUrl: String
+}
+
+class DoctorBooking {
+    - doctorId: String
+    - roomNo: String
+    - bookingDay: String
+    - startTime: String
+    - endTime: String
+}
+
+' ==============================================
+' PAYMENT CLASSES
+' ==============================================
+class Payment {
+    - userId: String
+    - appointmentId: String
+    - paymentStatus: String
+}
+
+class CardPayment {
+    - amount: Number
+    - stripePaymentIntentId: String
+}
+
+class InsurancePayment {
+    - insuranceProvider: String
+    - policyNumber: String
+    - coveredAmount: Number
+}
+
+class GovernmentPayment {
+    - coverageType: String
+    - approvalReference: String
+}
+
+' ==============================================
+' RELATIONSHIPS
+' ==============================================
+
+' User to Business Entities
+Patient --|> Appointment
+Doctor --|> Appointment
+Doctor --|> DoctorBooking
+
+' Appointment Relationships
+Appointment --|> MedicalRecord
+Appointment --|> Payment
+
+' Payment Inheritance
+Payment <|-- CardPayment
+Payment <|-- InsurancePayment
+Payment <|-- GovernmentPayment
+
+' Medical Records
+Patient --|> MedicalRecord
+
+@enduml
+

@@ -9,7 +9,7 @@ const GovernmentPayment = () => {
   const [formData, setFormData] = useState({
     approvalReferenceNumber: '',
     governmentId: '',
-    coverageProgram: 'medicare',
+    coverageProgram: '',
   });
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
@@ -25,7 +25,7 @@ const GovernmentPayment = () => {
     setError('');
 
     try {
-      // Step 1: Create the appointment
+      // Step 1: Create the appointment with 'Pending' status
       const appointmentRes = await fetch('http://localhost:5000/api/appointments/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,8 +57,24 @@ const GovernmentPayment = () => {
         throw new Error('Payment processing failed');
       }
 
-      await paymentRes.json();
-      alert('Appointment booked successfully! Government coverage approved.');
+      const paymentData = await paymentRes.json();
+
+      // Step 3: Update appointment to link payment (status remains 'Pending')
+      const updateRes = await fetch(`http://localhost:5000/api/appointments/${appointmentResponse.appointment._id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'Pending',
+          paymentType: 'government',
+          paymentId: paymentData.governmentPayment._id
+        })
+      });
+
+      if (!updateRes.ok) {
+        throw new Error('Failed to update appointment');
+      }
+
+      alert('Appointment submitted successfully! Pending admin approval for government coverage.');
       navigate('/patient-dashboard');
     } catch (err) {
       setError(err.message || 'An error occurred during payment processing');
@@ -115,12 +131,9 @@ const GovernmentPayment = () => {
               </div>
               <div className="col-span-2">
                 <p className="font-semibold">Total Amount:</p>
-                <p className="text-lg text-gray-700">${(appointmentData.channelingFee || 50).toFixed(2)}</p>
+                <p className="text-lg text-gray-700">Rs.{(appointmentData.channelingFee || 50).toFixed(2)}</p>
               </div>
-              <div className="col-span-2">
-                <p className="font-semibold">Coverage Status:</p>
-                <p className="text-2xl text-green-600">100% Covered</p>
-              </div>
+          
             </div>
           </div>
 
@@ -130,18 +143,15 @@ const GovernmentPayment = () => {
               <label className="block text-gray-700 font-semibold mb-2">
                 Coverage Program *
               </label>
-              <select
+              <input
+                type="text"
                 name="coverageProgram"
                 value={formData.coverageProgram}
                 onChange={handleInputChange}
                 required
+                placeholder="e.g., Divi neguma"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
-                <option value="medicare">Medicare</option>
-                <option value="medicaid">Medicaid</option>
-                <option value="veterans">Veterans Affairs</option>
-                <option value="other">Other Government Program</option>
-              </select>
+              />
             </div>
 
             <div>
@@ -161,7 +171,7 @@ const GovernmentPayment = () => {
 
             <div>
               <label className="block text-gray-700 font-semibold mb-2">
-                Approval Reference Number
+                Reference Number
               </label>
               <input
                 type="text"
@@ -171,9 +181,7 @@ const GovernmentPayment = () => {
                 placeholder="If you have a pre-approval reference"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
-              <p className="text-sm text-gray-500 mt-2">
-                Optional: If you have been pre-approved, enter your reference number
-              </p>
+              
             </div>
 
             {error && (
@@ -182,14 +190,7 @@ const GovernmentPayment = () => {
               </div>
             )}
 
-            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <h4 className="font-semibold text-green-800 mb-2">Government Coverage Benefits:</h4>
-              <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                <li>No out-of-pocket costs</li>
-                <li>Coverage verified automatically</li>
-                <li>Direct billing to government program</li>
-              </ul>
-            </div>
+            
 
             <div className="flex gap-4 mt-8">
               <button

@@ -5,10 +5,13 @@ const appointmentController = require('../controllers/appointmentController');
 // Analytics: Peak times
 router.get('/analytics/peak-times', appointmentController.getPeakTimes);
 
-router.get('/', appointmentController.getAllAppointments); // <-- NEW
+router.get('/', appointmentController.getAllAppointments);
 router.get('/slots', appointmentController.getAvailableSlots);
 router.post('/book', appointmentController.bookAppointment);
 router.get('/patient', appointmentController.getPatientAppointments);
 router.get('/doctor', appointmentController.getDoctorAppointments);
+router.get('/pending', appointmentController.getPendingAppointments);
+router.put('/:id/status', appointmentController.updateAppointmentStatus);
+router.get('/:id/payment-details', appointmentController.getAppointmentPaymentDetails);
 
 module.exports = router;

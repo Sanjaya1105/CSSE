@@ -169,3 +169,74 @@ exports.getPatientAppointments = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+// Get pending appointments
+exports.getPendingAppointments = async (req, res) => {
+  try {
+    const pendingAppointments = await Appointment.find({ status: 'Pending' });
+    res.json(pendingAppointments);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// Update appointment status
+exports.updateAppointmentStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status, paymentType, paymentId } = req.body;
+  try {
+    const updateData = { status };
+    if (paymentType) updateData.paymentType = paymentType;
+    if (paymentId) updateData.paymentId = paymentId;
+    
+    const appointment = await Appointment.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true }
+    );
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+    res.json({ success: true, appointment });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// Get payment details for an appointment
+exports.getAppointmentPaymentDetails = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const appointment = await Appointment.findById(id);
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    let paymentDetails = null;
+    if (appointment.paymentId && appointment.paymentType) {
+      const CardPayment = require('../models/Payments/CardPayment');
+      const GovernmentPayment = require('../models/Payments/GovernmentCoveredPayment');
+      const InsurancePayment = require('../models/Payments/InsurancePayment');
+
+      switch (appointment.paymentType) {
+        case 'card':
+          paymentDetails = await CardPayment.findById(appointment.paymentId);
+          break;
+        case 'government':
+          paymentDetails = await GovernmentPayment.findById(appointment.paymentId);
+          break;
+        case 'insurance':
+          paymentDetails = await InsurancePayment.findById(appointment.paymentId);
+          break;
+      }
+    }
+
+    res.json({ 
+      appointment, 
+      paymentDetails,
+      paymentType: appointment.paymentType 
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};

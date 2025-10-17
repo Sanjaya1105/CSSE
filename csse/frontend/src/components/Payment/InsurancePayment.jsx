@@ -13,7 +13,6 @@ const InsurancePayment = () => {
     policyNumber: '',
     claimReferenceNumber: '',
     coveredAmount: totalAmount,
-    coPaymentAmount: 0,
   });
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
@@ -29,7 +28,7 @@ const InsurancePayment = () => {
     setError('');
 
     try {
-      // Step 1: Create the appointment
+      // Step 1: Create the appointment with 'Pending' status
       const appointmentRes = await fetch('http://localhost:5000/api/appointments/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,7 +56,7 @@ const InsurancePayment = () => {
           policyNumber: formData.policyNumber,
           claimReferenceNumber: formData.claimReferenceNumber,
           coveredAmount: parseFloat(formData.coveredAmount),
-          coPaymentAmount: parseFloat(formData.coPaymentAmount),
+          coPaymentAmount: 0,
         })
       });
 
@@ -65,8 +64,24 @@ const InsurancePayment = () => {
         throw new Error('Payment processing failed');
       }
 
-      await paymentRes.json();
-      alert('Appointment booked successfully! Insurance claim submitted.');
+      const paymentData = await paymentRes.json();
+
+      // Step 3: Update appointment to link payment (status remains 'Pending')
+      const updateRes = await fetch(`http://localhost:5000/api/appointments/${appointmentResponse.appointment._id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'Pending',
+          paymentType: 'insurance',
+          paymentId: paymentData.insurancePayment._id
+        })
+      });
+
+      if (!updateRes.ok) {
+        throw new Error('Failed to update appointment');
+      }
+
+      alert('Appointment submitted successfully! Pending admin approval for insurance claim.');
       navigate('/patient-dashboard');
     } catch (err) {
       setError(err.message || 'An error occurred during payment processing');
@@ -94,8 +109,6 @@ const InsurancePayment = () => {
       </div>
     );
   }
-
-  const patientPayment = parseFloat(formData.coPaymentAmount) || 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-amber-100 py-12 px-4">
@@ -125,7 +138,7 @@ const InsurancePayment = () => {
               </div>
               <div className="col-span-2">
                 <p className="font-semibold">Total Amount:</p>
-                <p className="text-2xl text-yellow-600">${totalAmount.toFixed(2)}</p>
+                <p className="text-2xl text-yellow-600">Rs.{totalAmount.toFixed(2)}</p>
               </div>
             </div>
           </div>
@@ -136,22 +149,15 @@ const InsurancePayment = () => {
               <label className="block text-gray-700 font-semibold mb-2">
                 Insurance Provider *
               </label>
-              <select
+              <input
+                type="text"
                 name="insuranceProvider"
                 value={formData.insuranceProvider}
                 onChange={handleInputChange}
                 required
+                placeholder="e.g., Janashakthi Insurance, AIA"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              >
-                <option value="">Select your insurance provider</option>
-                <option value="Blue Cross Blue Shield">Blue Cross Blue Shield</option>
-                <option value="Aetna">Aetna</option>
-                <option value="Cigna">Cigna</option>
-                <option value="UnitedHealthcare">UnitedHealthcare</option>
-                <option value="Humana">Humana</option>
-                <option value="Kaiser Permanente">Kaiser Permanente</option>
-                <option value="Other">Other</option>
-              </select>
+              />
             </div>
 
             <div>
@@ -183,39 +189,20 @@ const InsurancePayment = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Insurance Covered Amount ($) *
-                </label>
-                <input
-                  type="number"
-                  name="coveredAmount"
-                  value={formData.coveredAmount}
-                  onChange={handleInputChange}
-                  required
-                  min="0"
-                  max={totalAmount}
-                  step="0.01"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Co-Payment Amount ($)
-                </label>
-                <input
-                  type="number"
-                  name="coPaymentAmount"
-                  value={formData.coPaymentAmount}
-                  onChange={handleInputChange}
-                  min="0"
-                  max={totalAmount}
-                  step="0.01"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                />
-              </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Insurance Covered Amount (Rs.) *
+              </label>
+              <input
+                type="number"
+                name="coveredAmount"
+                value={formData.coveredAmount}
+                readOnly
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+              />
+              <p className="text-sm text-gray-500 mt-2">
+                This amount is set to the channeling fee
+              </p>
             </div>
 
             {/* Payment Breakdown */}
@@ -224,15 +211,11 @@ const InsurancePayment = () => {
               <div className="space-y-2 text-sm text-gray-700">
                 <div className="flex justify-between">
                   <span>Total Consultation Fee:</span>
-                  <span className="font-semibold">${totalAmount.toFixed(2)}</span>
+                  <span className="font-semibold">Rs.{totalAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Insurance Coverage:</span>
-                  <span className="font-semibold text-green-600">-${parseFloat(formData.coveredAmount || 0).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between border-t pt-2">
-                  <span className="font-semibold">Your Co-Payment:</span>
-                  <span className="font-semibold text-yellow-700">${patientPayment.toFixed(2)}</span>
+                  <span className="font-semibold text-green-600">Rs.{parseFloat(formData.coveredAmount || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -243,15 +226,7 @@ const InsurancePayment = () => {
               </div>
             )}
 
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="font-semibold text-blue-800 mb-2">Important Information:</h4>
-              <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                <li>Your claim will be submitted to your insurance provider</li>
-                <li>Processing typically takes 3-5 business days</li>
-                <li>You'll receive a confirmation email once processed</li>
-                <li>Co-payment (if any) is due at the time of appointment</li>
-              </ul>
-            </div>
+            
 
             <div className="flex gap-4 mt-8">
               <button
