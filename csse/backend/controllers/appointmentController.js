@@ -39,10 +39,9 @@ exports.getDoctorAppointments = async (req, res) => {
     // Find doctor by register number
     const doctor = await DoctorBooking.findOne({ doctorId: registerNumber });
     if (!doctor) return res.status(404).json({ error: 'Doctor not found' });
-    // Find appointments for this doctor, excluding already channeled
+    // Find all appointments for this doctor, including channeled
     const appointments = await Appointment.find({
-      doctorId: doctor._id,
-      status: { $ne: 'Channeled' }
+      doctorId: doctor._id
     });
     res.json(appointments);
   } catch (err) {

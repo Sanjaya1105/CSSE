@@ -1,3 +1,30 @@
+// @desc    Update a medical record
+// @route   PUT /api/medical-records/:id
+// @access  Private (Doctor/Admin)
+const updateMedicalRecord = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { diagnosis, recommendation, medicines, nextDate } = req.body;
+    let updateFields = {
+      diagnosis,
+      recommendation,
+      medicines,
+      nextDate
+    };
+    // If a new report is uploaded
+    if (req.file) {
+      updateFields.reportUrl = `/uploads/medical-reports/${req.file.filename}`;
+    }
+    const updated = await MedicalRecord.findByIdAndUpdate(id, updateFields, { new: true });
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Medical record not found' });
+    }
+    res.status(200).json({ success: true, message: 'Medical record updated', data: updated });
+  } catch (error) {
+    console.error('Update medical record error:', error);
+    res.status(500).json({ success: false, message: 'Server error while updating medical record' });
+  }
+};
 const MedicalRecord = require('../models/MedicalRecord');
 const path = require('path');
 const fs = require('fs');
@@ -143,6 +170,7 @@ module.exports = {
   saveMedicalRecord,
   getPatientMedicalRecords,
   getAllMedicalRecords,
-  deleteMedicalRecord
+  deleteMedicalRecord,
+  updateMedicalRecord
 };
 

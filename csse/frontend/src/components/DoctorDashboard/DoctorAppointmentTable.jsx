@@ -9,9 +9,8 @@ const DoctorAppointmentTable = ({ appointments, loading, error }) => {
 
   // Guard against undefined/null and filter out already channeled
   const safeAppointments = Array.isArray(appointments) ? appointments : [];
-  const filteredAppointments = safeAppointments
-    .filter(appt => appt?.status !== 'Channeled')
-    .filter(appt => !doneChannels.includes(appt._id));
+  // Show all appointments, including channeled
+  const filteredAppointments = safeAppointments;
 
   const handleChannelClick = (appt) => {
     setSelectedAppointment(appt);
@@ -56,27 +55,31 @@ const DoctorAppointmentTable = ({ appointments, loading, error }) => {
           <table className="min-w-full border border-gray-200 rounded-lg">
             <thead className="bg-emerald-100">
               <tr>
-                <th className="py-2 px-4 border-b">#</th>
-                <th className="py-2 px-4 border-b">Patient Name</th>
-                <th className="py-2 px-4 border-b">Age</th>
-                <th className="py-2 px-4 border-b">Date</th>
-                <th className="py-2 px-4 border-b">Time</th>
-                <th className="py-2 px-4 border-b">Queue No</th>
-                <th className="py-2 px-4 border-b">Channel</th>
+                <th className="py-2 px-4 border-b text-center">#</th>
+                <th className="py-2 px-4 border-b text-left">Patient Name</th>
+                <th className="py-2 px-4 border-b text-center">Age</th>
+                <th className="py-2 px-4 border-b text-center">Date</th>
+                <th className="py-2 px-4 border-b text-center">Time</th>
+                <th className="py-2 px-4 border-b text-center">Queue No</th>
+                <th className="py-2 px-4 border-b text-center">Status</th>
+                <th className="py-2 px-4 border-b text-center">Channel</th>
               </tr>
             </thead>
             <tbody>
               {filteredAppointments.map((appt, idx) => (
                 <tr key={appt._id} className="hover:bg-emerald-50">
-                  <td className="py-2 px-4 border-b">{idx + 1}</td>
-                  <td className="py-2 px-4 border-b">{appt.patientName}</td>
-                  <td className="py-2 px-4 border-b">{appt.age}</td>
-                  <td className="py-2 px-4 border-b">{appt.date}</td>
-                  <td className="py-2 px-4 border-b">{appt.slotTime}</td>
-                  <td className="py-2 px-4 border-b">{appt.queueNumber}</td>
-                  <td className="py-2 px-4 border-b">
-                    {doneChannels.includes(appt._id) ? (
-                      <span className="px-3 py-1 bg-gray-300 text-green-700 rounded">Done</span>
+                  <td className="py-2 px-4 border-b text-center">{idx + 1}</td>
+                  <td className="py-2 px-4 border-b text-left">{appt.patientName}</td>
+                  <td className="py-2 px-4 border-b text-center">{appt.age}</td>
+                  <td className="py-2 px-4 border-b text-center">{appt.date}</td>
+                  <td className="py-2 px-4 border-b text-center">{appt.slotTime}</td>
+                  <td className="py-2 px-4 border-b text-center">{appt.queueNumber}</td>
+                  <td className="py-2 px-4 border-b text-center">{appt.status || 'Pending'}</td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {appt.status === 'Channeled' || doneChannels.includes(appt._id) ? (
+                      <button className="px-3 py-1 bg-gray-300 text-white rounded cursor-not-allowed" disabled>
+                        Channeled
+                      </button>
                     ) : (
                       <button
                         className="px-3 py-1 bg-emerald-500 text-white rounded hover:bg-emerald-600"

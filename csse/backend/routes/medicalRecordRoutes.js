@@ -45,6 +45,7 @@ router.post('/save', upload.single('report'), medicalRecordController.saveMedica
 router.get('/patient/:patientId', medicalRecordController.getPatientMedicalRecords);
 router.get('/', medicalRecordController.getAllMedicalRecords);
 router.delete('/:id', medicalRecordController.deleteMedicalRecord);
+router.put('/:id', upload.single('report'), medicalRecordController.updateMedicalRecord);
 
 module.exports = router;
 

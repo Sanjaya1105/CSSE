@@ -10,6 +10,8 @@ router.post('/', doctorController.createDoctor);
 router.get('/', doctorController.getDoctors);
 // Update doctor
 router.put('/:id', doctorController.updateDoctor);
+// Update channeling fee
+router.put('/:id/channeling-fee', doctorController.setChannelingFee);
 // Delete doctor
 router.delete('/:id', doctorController.deleteDoctor);
 
