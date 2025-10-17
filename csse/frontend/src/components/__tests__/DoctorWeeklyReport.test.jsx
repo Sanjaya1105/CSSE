@@ -123,6 +123,49 @@ describe('DoctorWeeklyReport', () => {
     expect(screen.queryByText('Dr. Smith')).not.toBeInTheDocument();
   });
 
+  it('resets filter when empty doctorId is entered', async () => {
+    render(<DoctorWeeklyReport />);
+    await waitFor(() => expect(screen.getByText('Dr. Smith')).toBeInTheDocument());
+    const input = screen.getByPlaceholderText(/Enter Doctor ID/i);
+    
+    // First filter to specific doctor
+    fireEvent.change(input, { target: { value: 'DR002' } });
+    fireEvent.click(screen.getByText(/Filter/i));
+    expect(screen.getByText('Dr. Jane')).toBeInTheDocument();
+    expect(screen.queryByText('Dr. Smith')).not.toBeInTheDocument();
+    
+    // Then clear filter
+    fireEvent.change(input, { target: { value: '' } });
+    fireEvent.click(screen.getByText(/Filter/i));
+    
+    // Should show all doctors again
+    await waitFor(() => {
+      expect(screen.getByText('Dr. Smith')).toBeInTheDocument();
+      expect(screen.getByText('Dr. Jane')).toBeInTheDocument();
+    });
+  });
+
+  it('resets filter with whitespace-only input', async () => {
+    render(<DoctorWeeklyReport />);
+    await waitFor(() => expect(screen.getByText('Dr. Smith')).toBeInTheDocument());
+    const input = screen.getByPlaceholderText(/Enter Doctor ID/i);
+    
+    // First filter to specific doctor
+    fireEvent.change(input, { target: { value: 'DR002' } });
+    fireEvent.click(screen.getByText(/Filter/i));
+    expect(screen.queryByText('Dr. Smith')).not.toBeInTheDocument();
+    
+    // Then clear with whitespace
+    fireEvent.change(input, { target: { value: '   ' } });
+    fireEvent.click(screen.getByText(/Filter/i));
+    
+    // Should show all doctors again
+    await waitFor(() => {
+      expect(screen.getByText('Dr. Smith')).toBeInTheDocument();
+      expect(screen.getByText('Dr. Jane')).toBeInTheDocument();
+    });
+  });
+
   it('calls PDF download when button clicked', async () => {
     const jsPDF = require('jspdf');
     render(<DoctorWeeklyReport />);
