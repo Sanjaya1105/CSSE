@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const governmentPaymentSchema = new mongoose.Schema({
   userId: {
@@ -34,4 +34,4 @@ const GovernmentPayment = mongoose.model(
   governmentPaymentSchema
 );
 
-export default GovernmentPayment;
+module.exports = GovernmentPayment;

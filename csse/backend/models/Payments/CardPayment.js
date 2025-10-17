@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const cardPaymentSchema = new mongoose.Schema({
   userId: {
@@ -44,4 +44,4 @@ cardPaymentSchema.pre("save", function (next) {
 
 const CardPayment = mongoose.model("CardPayment", cardPaymentSchema);
 
-export default CardPayment;
+module.exports = CardPayment;
