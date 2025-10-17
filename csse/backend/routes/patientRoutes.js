@@ -7,9 +7,12 @@ const {
   getPatientByIdForAdmin,
   getAdminPendingRequests,
   clearAdminPendingRequest,
-  searchPatients
+  searchPatients,
+  findPatientByNameAndAge
 } = require('../controllers/patientController');
 
+// Find patient by name and age
+router.get('/find', findPatientByNameAndAge);
 // Search patients (must be before /:id routes to avoid conflicts)
 router.get('/search', searchPatients);
 

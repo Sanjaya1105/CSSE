@@ -1,3 +1,21 @@
+3// @desc    Find patient by name and age
+// @route   GET /api/patient/find?name=...&age=...
+// @access  Public
+const findPatientByNameAndAge = async (req, res) => {
+  try {
+    const { name, age } = req.query;
+    if (!name || !age) {
+      return res.status(400).json({ error: 'Name and age required' });
+    }
+    const patient = await Patient.findOne({ name, age: Number(age) }).select('-password');
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+    res.json(patient);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 const Patient = require('../models/Patient');
 
 // In-memory storage for pending patient lookup requests (for doctors)
@@ -227,13 +245,14 @@ const searchPatients = async (req, res) => {
   }
 };
 
-module.exports = { 
-  getPatientById, 
-  getPendingRequests, 
+module.exports = {
+  getPatientById,
+  getPendingRequests,
   clearPendingRequest,
   getPatientByIdForAdmin,
   getAdminPendingRequests,
   clearAdminPendingRequest,
-  searchPatients
+  searchPatients,
+  findPatientByNameAndAge
 };
 
