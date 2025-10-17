@@ -55,4 +55,21 @@ describe('medicalRecordController', () => {
     expect(r.status).toHaveBeenCalledWith(200);
     expect(r.json).toHaveBeenCalledWith(expect.objectContaining({ count: 2 }));
   });
+
+    test('getAllMedicalRecords handles error', async () => {
+      const { getAllMedicalRecords } = require('../../controllers/medicalRecordController');
+      MedicalRecord.find = jest.fn(() => { throw new Error('DB error'); });
+      const r = res();
+      await getAllMedicalRecords({}, r);
+      expect(r.status).toHaveBeenCalledWith(500);
+      expect(r.json).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+    });
+
+    test('deleteMedicalRecord handles error', async () => {
+      MedicalRecord.findById = jest.fn().mockImplementation(() => { throw new Error('DB error'); });
+      const r = res();
+      await deleteMedicalRecord({ params: { id: 'x' } }, r);
+      expect(r.status).toHaveBeenCalledWith(500);
+      expect(r.json).toHaveBeenCalledWith(expect.objectContaining({ success: false }));
+    });
 });

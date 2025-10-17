@@ -98,6 +98,7 @@ describe('Payment Models', () => {
       const insurancePayment = new InsurancePayment();
       const validationError = insurancePayment.validateSync();
       
+    
       expect(validationError.errors.userId).toBeDefined();
       expect(validationError.errors.appointmentId).toBeDefined();
       expect(validationError.errors.insuranceProvider).toBeDefined();
