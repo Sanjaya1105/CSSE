@@ -6,8 +6,11 @@ exports.getDoctorAppointments = async (req, res) => {
     // Find doctor by register number
     const doctor = await DoctorBooking.findOne({ doctorId: registerNumber });
     if (!doctor) return res.status(404).json({ error: 'Doctor not found' });
-    // Find appointments for this doctor
-    const appointments = await Appointment.find({ doctorId: doctor._id });
+    // Find appointments for this doctor, excluding already channeled
+    const appointments = await Appointment.find({
+      doctorId: doctor._id,
+      status: { $ne: 'Channeled' }
+    });
     res.json(appointments);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
@@ -34,8 +37,11 @@ exports.getDoctorAppointments = async (req, res) => {
     // Find doctor by register number
     const doctor = await DoctorBooking.findOne({ doctorId: registerNumber });
     if (!doctor) return res.status(404).json({ error: 'Doctor not found' });
-    // Find appointments for this doctor
-    const appointments = await Appointment.find({ doctorId: doctor._id });
+    // Find appointments for this doctor, excluding already channeled
+    const appointments = await Appointment.find({
+      doctorId: doctor._id,
+      status: { $ne: 'Channeled' }
+    });
     res.json(appointments);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
