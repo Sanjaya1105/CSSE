@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import SuperAdminAnalytics from './SuperAdminAnalytics';
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const SuperAdminDashboard = () => {
   const [adminList, setAdminList] = React.useState([]);
   const [pendingDoctors, setPendingDoctors] = React.useState([]);
   const [doctorMsg, setDoctorMsg] = React.useState('');
+  const [showAnalytics, setShowAnalytics] = React.useState(false);
 
   React.useEffect(() => {
     fetch('http://localhost:5000/api/superadmin/admins')
@@ -159,6 +161,16 @@ const SuperAdminDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <button
+              className={`px-4 py-2 rounded-lg transition font-semibold ${
+                showAnalytics 
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-700' 
+                  : 'bg-indigo-500 text-white hover:bg-indigo-600'
+              }`}
+              onClick={() => setShowAnalytics(!showAnalytics)}
+            >
+              {showAnalytics ? '📋 Dashboard View' : '📊 Analytical View'}
+            </button>
+            <button
               className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold"
               onClick={handleViewAllUsers}
             >
@@ -187,6 +199,11 @@ const SuperAdminDashboard = () => {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-8">
+        {/* Conditional Rendering: Analytics View or Regular Dashboard */}
+        {showAnalytics ? (
+          <SuperAdminAnalytics />
+        ) : (
+          <>
         {/* Section 1: Pending Doctor Accounts */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border-l-8 border-blue-400">
           <h2 className="text-2xl font-bold text-blue-700 mb-6">Pending Doctor Accounts</h2>
@@ -336,6 +353,8 @@ const SuperAdminDashboard = () => {
           )}
           {message && <p className="mt-2 text-red-600">{message}</p>}
         </div>
+          </>
+        )}
       </div>
     </div>
   );
