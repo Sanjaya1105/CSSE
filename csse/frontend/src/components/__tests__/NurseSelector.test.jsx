@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import NurseSelector from '../Staff/NurseSelector';
+import { NurseSelector } from '../Staff';
 
 const mockNurses = [
   { _id: 'n1', name: 'Nurse Alice', staffId: 'S001' },

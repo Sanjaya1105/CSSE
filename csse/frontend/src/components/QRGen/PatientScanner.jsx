@@ -12,6 +12,14 @@ const PatientScanner = () => {
   const [showMedicalRecords, setShowMedicalRecords] = useState(false);
   const [medicalRecords, setMedicalRecords] = useState([]);
   const [loadingRecords, setLoadingRecords] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    diagnosis: '',
+    recommendation: '',
+    medicines: '',
+    nextDate: ''
+  });
+  const [editReportFiles, setEditReportFiles] = useState([]);
   const pollingInterval = useRef(null);
 
   // Check if returning from medical record submission
@@ -131,6 +139,128 @@ const PatientScanner = () => {
       alert('Error loading medical records');
     } finally {
       setLoadingRecords(false);
+    }
+  };
+
+  // Handle edit record
+  const handleEditRecord = (record) => {
+    setEditingRecord(record);
+    setEditFormData({
+      diagnosis: record.diagnosis || '',
+      recommendation: record.recommendation || '',
+      medicines: record.medicines || '',
+      nextDate: record.nextDate || ''
+    });
+    setEditReportFiles([]);
+  };
+
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingRecord(null);
+    setEditFormData({
+      diagnosis: '',
+      recommendation: '',
+      medicines: '',
+      nextDate: ''
+    });
+    setEditReportFiles([]);
+  };
+
+  // Handle edit form change
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle edit file change
+  const handleEditFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    const validFiles = files.filter(file => {
+      if (file.type !== 'application/pdf') return false;
+      if (file.size > 10 * 1024 * 1024) return false;
+      return true;
+    });
+
+    setEditReportFiles(prev => [...prev, ...validFiles]);
+  };
+
+  // Handle remove edit file
+  const handleRemoveEditFile = (index) => {
+    setEditReportFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Handle update record
+  const handleUpdateRecord = async (e) => {
+    e.preventDefault();
+
+    if (!editFormData.diagnosis || !editFormData.medicines) {
+      alert('Please fill in diagnosis and medicines');
+      return;
+    }
+
+    try {
+      const submitData = new FormData();
+      submitData.append('diagnosis', editFormData.diagnosis);
+      submitData.append('recommendation', editFormData.recommendation);
+      submitData.append('medicines', editFormData.medicines);
+      submitData.append('nextDate', editFormData.nextDate);
+
+      // Append files if any
+      if (editReportFiles.length > 0) {
+        editReportFiles.forEach(file => {
+          submitData.append('reports', file);
+        });
+      }
+
+      const response = await fetch(`http://localhost:5000/api/medical-records/${editingRecord._id}`, {
+        method: 'PUT',
+        body: submitData
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        alert('Medical record updated successfully!');
+        setEditingRecord(null);
+        // Refresh medical records
+        handleViewMedicalRecords();
+      } else {
+        alert(data.message || 'Failed to update medical record');
+      }
+    } catch (error) {
+      console.error('Error updating medical record:', error);
+      alert('Error updating medical record');
+    }
+  };
+
+  // Handle delete record
+  const handleDeleteRecord = async (recordId) => {
+    if (!window.confirm('Are you sure you want to delete this medical record? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/medical-records/${recordId}`, {
+        method: 'DELETE'
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        alert('Medical record deleted successfully!');
+        // Refresh medical records
+        handleViewMedicalRecords();
+      } else {
+        alert(data.message || 'Failed to delete medical record');
+      }
+    } catch (error) {
+      console.error('Error deleting medical record:', error);
+      alert('Error deleting medical record');
     }
   };
 
@@ -439,6 +569,116 @@ const PatientScanner = () => {
                     key={record._id}
                     className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition"
                   >
+                    {editingRecord && editingRecord._id === record._id ? (
+                      /* Edit Form */
+                      <form onSubmit={handleUpdateRecord} className="space-y-4">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-lg font-bold text-blue-600">
+                            Editing Record #{medicalRecords.length - index}
+                          </h3>
+                          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+                            Edit Mode
+                          </span>
+                        </div>
+
+                        {/* Diagnosis */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-1">Diagnosis *</label>
+                          <textarea
+                            name="diagnosis"
+                            value={editFormData.diagnosis}
+                            onChange={handleEditFormChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            rows="2"
+                            required
+                          />
+                        </div>
+
+                        {/* Medicines */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-1">Medicines *</label>
+                          <textarea
+                            name="medicines"
+                            value={editFormData.medicines}
+                            onChange={handleEditFormChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            rows="2"
+                            required
+                          />
+                        </div>
+
+                        {/* Recommendation */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-1">Recommendation</label>
+                          <textarea
+                            name="recommendation"
+                            value={editFormData.recommendation}
+                            onChange={handleEditFormChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            rows="2"
+                          />
+                        </div>
+
+                        {/* Next Date */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-1">Next Appointment Date</label>
+                          <input
+                            type="date"
+                            name="nextDate"
+                            value={editFormData.nextDate}
+                            onChange={handleEditFormChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+
+                        {/* File Upload */}
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-700 mb-1">Add More Reports (PDF)</label>
+                          <input
+                            type="file"
+                            accept=".pdf"
+                            multiple
+                            onChange={handleEditFileChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                          />
+                          {editReportFiles.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              {editReportFiles.map((file, idx) => (
+                                <div key={idx} className="flex items-center justify-between bg-blue-50 p-2 rounded text-sm">
+                                  <span>{file.name}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveEditFile(idx)}
+                                    className="text-red-600 hover:text-red-800 text-xs"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Edit Actions */}
+                        <div className="flex gap-2 pt-2">
+                          <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                          >
+                            Update Record
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      /* Display Mode */
+                      <>
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <h3 className="text-lg font-bold text-gray-800">
@@ -454,9 +694,23 @@ const PatientScanner = () => {
                           })}
                         </p>
                       </div>
-                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
-                        Age: {record.age}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                          Age: {record.age}
+                        </span>
+                        <button
+                          onClick={() => handleEditRecord(record)}
+                          className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-semibold"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteRecord(record._id)}
+                          className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm font-semibold"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -479,18 +733,25 @@ const PatientScanner = () => {
 
                       {record.reportUrl && (
                         <div className="bg-yellow-50 p-3 rounded-lg">
-                          <p className="text-sm font-semibold text-yellow-600 mb-1">Report</p>
-                          <a
-                            href={`http://localhost:5000${record.reportUrl}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline flex items-center gap-1"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            View Report PDF
-                          </a>
+                          <p className="text-sm font-semibold text-yellow-600 mb-1">
+                            Report{record.reportUrl.includes(',') ? 's' : ''}
+                          </p>
+                          <div className="space-y-1">
+                            {record.reportUrl.split(',').map((url, idx) => (
+                              <a
+                                key={idx}
+                                href={`http://localhost:5000${url.trim()}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline flex items-center gap-1"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                {record.reportUrl.split(',').length > 1 ? `Report ${idx + 1}` : 'View Report PDF'}
+                              </a>
+                            ))}
+                          </div>
                         </div>
                       )}
 
@@ -507,6 +768,8 @@ const PatientScanner = () => {
                         </div>
                       )}
                     </div>
+                    </>
+                    )}
                   </div>
                 ))}
               </div>

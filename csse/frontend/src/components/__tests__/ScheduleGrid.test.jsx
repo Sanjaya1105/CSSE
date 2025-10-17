@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import ScheduleGrid from '../Doctor/ScheduleGrid';
+import { ScheduleGrid } from '../Doctor';
 
 describe('ScheduleGrid Component', () => {
   const mockOnSlotClick = jest.fn();

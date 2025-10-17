@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import PeakTimesAnalytics from '../PeakTimesAnalytics';
+import { PeakTimesAnalytics } from '../Admin';
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {

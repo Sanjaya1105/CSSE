@@ -1,14 +1,9 @@
 import React from 'react';
-import StaffTable from './Staff/StaffTable';
-import SuccessToast from './Staff/SuccessToast';
 import { useNavigate } from 'react-router-dom';
-import DoctorForm from './Doctor/DoctorForm';
-import DoctorTable from './Doctor/DoctorTable';
-import ScheduleGrid from './Doctor/ScheduleGrid';
-import AdminAppointmentTable from './AdminAppointment/AdminAppointmentTable';
-import PendingAppointmentTable from './AdminAppointment/PendingAppointmentTable';
-
-import DoctorWeeklyReport from './Doctor/DoctorWeeklyReport';
+import { StaffTable, SuccessToast } from '../Staff';
+import { DoctorForm, DoctorTable, ScheduleGrid, DoctorWeeklyReport } from '../Doctor';
+import AdminAppointmentTable from '../AdminAppointment/AdminAppointmentTable';
+import PendingAppointmentTable from '../AdminAppointment/PendingAppointmentTable';
 import PeakTimesAnalytics from './PeakTimesAnalytics';
 
 const AdminDashboard = () => {

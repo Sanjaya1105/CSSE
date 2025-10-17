@@ -13,7 +13,7 @@ const AddMedicalRecord = () => {
     medicines: '',
     nextDate: ''
   });
-  const [reportFile, setReportFile] = useState(null);
+  const [reportFiles, setReportFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
 
@@ -33,23 +33,43 @@ const AddMedicalRecord = () => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    const files = Array.from(e.target.files);
+    
+    if (files.length === 0) return;
+
+    // Validate all files
+    const invalidFiles = [];
+    const validFiles = [];
+    
+    files.forEach(file => {
       // Validate PDF
       if (file.type !== 'application/pdf') {
-        setMessage({ text: 'Please upload a PDF file only', type: 'error' });
-        e.target.value = '';
+        invalidFiles.push(`${file.name} (not a PDF)`);
         return;
       }
-      // Validate size (max 10MB)
+      // Validate size (max 10MB per file)
       if (file.size > 10 * 1024 * 1024) {
-        setMessage({ text: 'File size must be less than 10MB', type: 'error' });
-        e.target.value = '';
+        invalidFiles.push(`${file.name} (exceeds 10MB)`);
         return;
       }
-      setReportFile(file);
+      validFiles.push(file);
+    });
+
+    if (invalidFiles.length > 0) {
+      setMessage({ 
+        text: `Invalid files: ${invalidFiles.join(', ')}. Only PDF files under 10MB are allowed.`, 
+        type: 'error' 
+      });
+    } else {
       setMessage({ text: '', type: '' });
     }
+
+    // Add valid files to existing files
+    setReportFiles(prev => [...prev, ...validFiles]);
+  };
+
+  const handleRemoveFile = (index) => {
+    setReportFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -75,8 +95,11 @@ const AddMedicalRecord = () => {
       submitData.append('medicines', formData.medicines);
       submitData.append('nextDate', formData.nextDate);
       
-      if (reportFile) {
-        submitData.append('report', reportFile);
+      // Append all report files
+      if (reportFiles.length > 0) {
+        reportFiles.forEach((file, index) => {
+          submitData.append('reports', file); // 'reports' for multiple files
+        });
       }
 
       const response = await fetch('http://localhost:5000/api/medical-records/save', {
@@ -96,11 +119,11 @@ const AddMedicalRecord = () => {
           medicines: '',
           nextDate: ''
         });
-        setReportFile(null);
+        setReportFiles([]);
         
-        // Navigate back to patient view after 1.5 seconds
+        // Navigate back to patient scanner view after 1.5 seconds
         setTimeout(() => {
-          navigate('/patient-scanner', { state: { patientData, returnToPatient: true } });
+          navigate('/patient-scanner');
         }, 1500);
       } else {
         setMessage({ text: data.message || 'Failed to save medical record', type: 'error' });
@@ -130,7 +153,7 @@ const AddMedicalRecord = () => {
             onClick={handleCancel}
             className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
           >
-            Back to Scanner
+            Back to Patient View
           </button>
         </div>
       </nav>
@@ -233,24 +256,47 @@ const AddMedicalRecord = () => {
               />
             </div>
 
-            {/* Report Upload */}
+            {/* Report Upload - Multiple Files */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Upload Report (PDF)
+                Upload Medical Reports (PDF)
               </label>
               <input
                 type="file"
                 accept=".pdf"
+                multiple
                 onChange={handleFileChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
               />
               <p className="text-xs text-gray-500 mt-1">
-                PDF only, max 10MB
+                Select one or more PDF files (max 10MB each)
               </p>
-              {reportFile && (
-                <p className="text-sm text-green-600 mt-2">
-                  ✓ Selected: {reportFile.name}
-                </p>
+              
+              {/* Display Selected Files */}
+              {reportFiles.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <p className="text-sm font-semibold text-gray-700">
+                    Selected Files ({reportFiles.length}):
+                  </p>
+                  {reportFiles.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between bg-green-50 p-3 rounded-lg border border-green-200">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-sm text-gray-800">{file.name}</span>
+                        <span className="text-xs text-gray-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFile(index)}
+                        className="px-3 py-1 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
 

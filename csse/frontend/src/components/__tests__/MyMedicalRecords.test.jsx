@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
-import MyMedicalRecords from '../MyMedicalRecords';
+import { MyMedicalRecords } from '../Patient';
 import { MemoryRouter } from 'react-router-dom';
 
 const mockNavigate = jest.fn();

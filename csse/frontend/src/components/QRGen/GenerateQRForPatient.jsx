@@ -25,19 +25,31 @@ const GenerateQRForPatient = () => {
     setSearchResults([]);
 
     try {
+      console.log('Searching for:', searchTerm);
       const response = await fetch(`http://localhost:5000/api/patient/search?query=${encodeURIComponent(searchTerm)}`);
+      console.log('Response status:', response.status);
+      
       const data = await response.json();
+      console.log('Search response data:', data);
 
-      if (data.success && data.data.length > 0) {
-        setSearchResults(data.data);
-        setError('');
+      if (response.ok && data.success) {
+        if (data.data && data.data.length > 0) {
+          console.log('Found patients:', data.data.length);
+          setSearchResults(data.data);
+          setError('');
+        } else {
+          console.log('No patients found in results');
+          setSearchResults([]);
+          setError(`No patients found matching "${searchTerm}". Try searching by full name or ID card number.`);
+        }
       } else {
+        console.error('API returned error:', data.message);
         setSearchResults([]);
-        setError('No patients found matching your search');
+        setError(data.message || 'Failed to search patients');
       }
     } catch (err) {
       console.error('Search error:', err);
-      setError('Error searching for patients. Please try again.');
+      setError('Error searching for patients. Please check if the backend server is running.');
     } finally {
       setLoading(false);
     }
@@ -76,8 +88,8 @@ const GenerateQRForPatient = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8 no-print">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 no-print">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Search Patient</h2>
 
           {/* Search Form */}
@@ -102,9 +114,15 @@ const GenerateQRForPatient = () => {
                 {loading ? 'Searching...' : 'Search'}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Search by patient name or ID card number
-            </p>
+            <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-xs font-semibold text-blue-800 mb-1">💡 Search Tips:</p>
+              <ul className="text-xs text-blue-700 space-y-1">
+                <li>• Enter partial or full patient name (e.g., "John" or "John Doe")</li>
+                <li>• Enter ID card number (exact or partial match)</li>
+                <li>• Search is case-insensitive</li>
+                <li>• Press Enter or click Search button</li>
+              </ul>
+            </div>
           </form>
 
           {/* Error Message */}

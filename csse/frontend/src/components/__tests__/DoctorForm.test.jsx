@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import DoctorForm from '../Doctor/DoctorForm';
+import { DoctorForm } from '../Doctor';
 
 describe('DoctorForm Component', () => {
   const mockOnChange = jest.fn();

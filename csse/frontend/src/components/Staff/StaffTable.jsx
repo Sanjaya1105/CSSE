@@ -1,8 +1,8 @@
-import ScheduleGrid from '../Doctor/ScheduleGrid';
-import NurseSelector from './NurseSelector';
-import NurseModal from './NurseModal';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ScheduleGrid } from '../Doctor';
+import NurseSelector from './NurseSelector';
+import NurseModal from './NurseModal';
 
 const StaffTable = ({ onShowSuccess }) => {
   const navigate = useNavigate();

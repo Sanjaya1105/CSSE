@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import StaffTable from '../Staff/StaffTable';
+import { StaffTable } from '../Staff';
 import { MemoryRouter } from 'react-router-dom';
 
 const mockStaff = [

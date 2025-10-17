@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import AddMedicalRecord from '../AddMedicalRecord';
+import { AddMedicalRecord } from '../Doctor';
 import { MemoryRouter } from 'react-router-dom';
 
 const mockNavigate = jest.fn();
@@ -233,7 +233,7 @@ describe('AddMedicalRecord Component', () => {
     
     fireEvent.change(fileInput, { target: { files: [file] } });
     
-    expect(screen.getByText(/Please upload a PDF file only/i)).toBeInTheDocument();
+    expect(screen.getByText(/Invalid files:.*not a PDF.*Only PDF files under 10MB are allowed/i)).toBeInTheDocument();
   });
 
   test('rejects file larger than 10MB', () => {
@@ -250,7 +250,7 @@ describe('AddMedicalRecord Component', () => {
     
     fireEvent.change(fileInput, { target: { files: [largeFile] } });
     
-    expect(screen.getByText(/File size must be less than 10MB/i)).toBeInTheDocument();
+    expect(screen.getByText(/Invalid files:.*exceeds 10MB.*Only PDF files under 10MB are allowed/i)).toBeInTheDocument();
   });
 
   test('accepts valid PDF file under 10MB', () => {

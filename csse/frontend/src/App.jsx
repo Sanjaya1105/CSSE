@@ -1,24 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './components/Login'
 import Register from './components/Register'
-import PatientDashboard from './components/PatientDashboard'
-import DoctorDashboard from './components/DoctorDashboard'
-import NurseDashboard from './components/NurseDashboard'
-import SuperAdminDashboard from './components/SuperAdminDashboard'
-import AdminDashboard from './components/AdminDashboard'
-import PatientScanner from './components/PatientScanner'
-import AdminPatientScanner from './components/AdminPatientScanner'
-import AddMedicalRecord from './components/AddMedicalRecord'
-import MyMedicalRecords from './components/MyMedicalRecords'
-import MyAppointments from './components/MyAppointments'
-import GenerateQRForPatient from './components/GenerateQRForPatient'
-import ViewAllUsers from './components/ViewAllUsers'
+import { PatientDashboard, MyMedicalRecords, MyAppointments } from './components/Patient'
+import { DoctorDashboard, AddMedicalRecord } from './components/Doctor'
+import { NurseDashboard } from './components/Staff'
+import { SuperAdminDashboard, ViewAllUsers } from './components/SuperAdmin'
+import { AdminDashboard } from './components/Admin'
+import { PatientScanner, AdminPatientScanner, GenerateQRForPatient } from './components/QRGen'
 import './App.css'
-import StaffTable from './components/Staff/StaffTable';
-import PaymentMethodSelection from './components/PaymentMethodSelection'
-import CardPayment from './components/Payment/CardPayment'
-import GovernmentPayment from './components/Payment/GovernmentPayment'
-import InsurancePayment from './components/Payment/InsurancePayment'
+import { StaffTable } from './components/Staff';
+import { PaymentMethodSelection, CardPayment, GovernmentPayment, InsurancePayment } from './components/Payment'
 
 function App() {
   return (

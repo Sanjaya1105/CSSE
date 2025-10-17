@@ -41,11 +41,11 @@ const upload = multer({
 });
 
 // Routes
-router.post('/save', upload.single('report'), medicalRecordController.saveMedicalRecord);
+router.post('/save', upload.array('reports', 10), medicalRecordController.saveMedicalRecord); // Support up to 10 files
 router.get('/patient/:patientId', medicalRecordController.getPatientMedicalRecords);
 router.get('/', medicalRecordController.getAllMedicalRecords);
 router.delete('/:id', medicalRecordController.deleteMedicalRecord);
-router.put('/:id', upload.single('report'), medicalRecordController.updateMedicalRecord);
+router.put('/:id', upload.array('reports', 10), medicalRecordController.updateMedicalRecord); // Support up to 10 files for updates too
 
 module.exports = router;
 

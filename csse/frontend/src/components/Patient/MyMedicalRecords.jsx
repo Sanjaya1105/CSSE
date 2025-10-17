@@ -219,20 +219,25 @@ const MyMedicalRecords = () => {
                           {record.reportUrl && (
                             <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                               <p className="text-sm font-semibold text-yellow-600 mb-2">
-                                Medical Report
+                                Medical Report{record.reportUrl.includes(',') ? 's' : ''}
                               </p>
-                              <a
-                                href={`http://localhost:5000${record.reportUrl}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 hover:underline font-semibold"
-                              >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                Download Report PDF
-                              </a>
+                              <div className="space-y-2">
+                                {record.reportUrl.split(',').map((url, idx) => (
+                                  <a
+                                    key={idx}
+                                    href={`http://localhost:5000${url.trim()}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 hover:underline font-semibold block"
+                                  >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Download Report {record.reportUrl.includes(',') ? `#${idx + 1}` : ''} PDF
+                                  </a>
+                                ))}
+                              </div>
                             </div>
                           )}
 

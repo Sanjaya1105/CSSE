@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import PaymentMethodSelection from '../PaymentMethodSelection';
+import { PaymentMethodSelection } from '../Payment';
 import { MemoryRouter } from 'react-router-dom';
 
 

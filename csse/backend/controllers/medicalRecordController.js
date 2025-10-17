@@ -5,20 +5,34 @@ const updateMedicalRecord = async (req, res) => {
   try {
     const { id } = req.params;
     const { diagnosis, recommendation, medicines, nextDate } = req.body;
+    
+    // Get existing record to preserve or append files
+    const existingRecord = await MedicalRecord.findById(id);
+    if (!existingRecord) {
+      return res.status(404).json({ success: false, message: 'Medical record not found' });
+    }
+    
     let updateFields = {
       diagnosis,
       recommendation,
       medicines,
       nextDate
     };
-    // If a new report is uploaded
-    if (req.file) {
-      updateFields.reportUrl = `/uploads/medical-reports/${req.file.filename}`;
+    
+    // If new reports are uploaded, append them to existing ones
+    if (req.files && req.files.length > 0) {
+      const newReportUrls = req.files.map(f => `/uploads/medical-reports/${f.filename}`);
+      
+      // Append new files to existing ones (comma-separated)
+      if (existingRecord.reportUrl) {
+        updateFields.reportUrl = existingRecord.reportUrl + ',' + newReportUrls.join(',');
+      } else {
+        updateFields.reportUrl = newReportUrls.join(',');
+      }
     }
+    
     const updated = await MedicalRecord.findByIdAndUpdate(id, updateFields, { new: true });
-    if (!updated) {
-      return res.status(404).json({ success: false, message: 'Medical record not found' });
-    }
+    console.log(`✅ Medical record updated for ID: ${id}`);
     res.status(200).json({ success: true, message: 'Medical record updated', data: updated });
   } catch (error) {
     console.error('Update medical record error:', error);
@@ -45,7 +59,12 @@ const saveMedicalRecord = async (req, res) => {
     }
 
     let reportUrl = '';
-    if (req.file) {
+    // Handle multiple files
+    if (req.files && req.files.length > 0) {
+      // Store all file URLs as comma-separated string
+      reportUrl = req.files.map(f => `/uploads/medical-reports/${f.filename}`).join(',');
+    } else if (req.file) {
+      // Fallback for single file (backward compatibility)
       reportUrl = `/uploads/medical-reports/${req.file.filename}`;
     }
 
