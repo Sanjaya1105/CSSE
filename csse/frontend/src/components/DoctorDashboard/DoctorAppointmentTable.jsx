@@ -7,6 +7,12 @@ const DoctorAppointmentTable = ({ appointments, loading, error }) => {
   const [saveError, setSaveError] = useState(null);
   const [doneChannels, setDoneChannels] = useState([]);
 
+  // Guard against undefined/null and filter out already channeled
+  const safeAppointments = Array.isArray(appointments) ? appointments : [];
+  const filteredAppointments = safeAppointments
+    .filter(appt => appt?.status !== 'Channeled')
+    .filter(appt => !doneChannels.includes(appt._id));
+
   const handleChannelClick = (appt) => {
     setSelectedAppointment(appt);
   };
@@ -43,7 +49,7 @@ const DoctorAppointmentTable = ({ appointments, loading, error }) => {
         <p className="text-gray-500">Loading appointments...</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
-      ) : appointments.length === 0 ? (
+      ) : filteredAppointments.length === 0 ? (
         <p className="text-gray-500">No appointments found.</p>
       ) : (
         <div className="overflow-x-auto">
@@ -60,7 +66,7 @@ const DoctorAppointmentTable = ({ appointments, loading, error }) => {
               </tr>
             </thead>
             <tbody>
-              {appointments.map((appt, idx) => (
+              {filteredAppointments.map((appt, idx) => (
                 <tr key={appt._id} className="hover:bg-emerald-50">
                   <td className="py-2 px-4 border-b">{idx + 1}</td>
                   <td className="py-2 px-4 border-b">{appt.patientName}</td>
