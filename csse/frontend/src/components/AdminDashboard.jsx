@@ -4,7 +4,9 @@ import DoctorForm from './Doctor/DoctorForm';
 import DoctorTable from './Doctor/DoctorTable';
 import ScheduleGrid from './Doctor/ScheduleGrid';
 import AdminAppointmentTable from './AdminAppointment/AdminAppointmentTable';
+
 import DoctorWeeklyReport from './Doctor/DoctorWeeklyReport';
+import PeakTimesAnalytics from './PeakTimesAnalytics';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -272,7 +274,10 @@ const AdminDashboard = () => {
           <h2 className="mb-6 text-2xl font-bold text-yellow-700">Doctor Weekly Report</h2>
           <DoctorWeeklyReport />
         </div>
-      </div>
+  </div>
+
+  {/* Section 5: Patient Peak Times Analytics */}
+  <PeakTimesAnalytics />
     </div>
   );
 };
