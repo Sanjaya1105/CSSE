@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const insurancePaymentSchema = new mongoose.Schema({
   userId: {
@@ -45,4 +45,4 @@ const InsurancePayment = mongoose.model(
   insurancePaymentSchema
 );
 
-export default InsurancePayment;
+module.exports = InsurancePayment;
