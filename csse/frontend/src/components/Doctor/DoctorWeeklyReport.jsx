@@ -7,37 +7,43 @@ const DoctorWeeklyReport = () => {
   const [loading, setLoading] = useState(true);
   const [doctorIdInput, setDoctorIdInput] = useState('');
   const [filteredReport, setFilteredReport] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Fetch all appointments and doctors
     Promise.all([
       fetch('http://localhost:5000/api/doctors').then(res => res.json()),
       fetch('http://localhost:5000/api/appointments').then(res => res.json())
-    ]).then(([doctors, appointments]) => {
-      // Group appointments by doctorRegisterNumber and week
-      const weekMap = {};
-      appointments.forEach(appt => {
-        const doctorRegNum = appt.doctorRegisterNumber;
-        const week = getWeekNumber(new Date(appt.date));
-        if (!weekMap[doctorRegNum]) weekMap[doctorRegNum] = {};
-        if (!weekMap[doctorRegNum][week]) weekMap[doctorRegNum][week] = 0;
-        weekMap[doctorRegNum][week]++;
+    ])
+      .then(([doctors, appointments]) => {
+        // Group appointments by doctorRegisterNumber and week
+        const weekMap = {};
+        appointments.forEach(appt => {
+          const doctorRegNum = appt.doctorRegisterNumber;
+          const week = getWeekNumber(new Date(appt.date));
+          if (!weekMap[doctorRegNum]) weekMap[doctorRegNum] = {};
+          if (!weekMap[doctorRegNum][week]) weekMap[doctorRegNum][week] = 0;
+          weekMap[doctorRegNum][week]++;
+        });
+        // Build report array
+        const reportArr = doctors.map(doc => {
+          const doctorWeeks = weekMap[doc.doctorId] || {};
+          const totalWeekly = Object.entries(doctorWeeks).map(([week, count]) => ({ week, count }));
+          return {
+            doctorId: doc.doctorId,
+            doctorName: doc.doctorName,
+            roomNo: doc.roomNo,
+            weeklyCounts: totalWeekly
+          };
+        });
+        setReport(reportArr);
+        setFilteredReport(reportArr); // default: all
+        setLoading(false);
+      })
+      .catch(err => {
+        setError('Failed to load report');
+        setLoading(false);
       });
-      // Build report array
-      const reportArr = doctors.map(doc => {
-        const doctorWeeks = weekMap[doc.doctorId] || {};
-        const totalWeekly = Object.entries(doctorWeeks).map(([week, count]) => ({ week, count }));
-        return {
-          doctorId: doc.doctorId,
-          doctorName: doc.doctorName,
-          roomNo: doc.roomNo,
-          weeklyCounts: totalWeekly
-        };
-      });
-      setReport(reportArr);
-      setFilteredReport(reportArr); // default: all
-      setLoading(false);
-    });
   }, []);
 
   // Filter report by doctorId
@@ -82,7 +88,9 @@ const DoctorWeeklyReport = () => {
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 mt-8">
       <h2 className="text-2xl font-bold text-blue-700 mb-6">Doctor Weekly Appointment Report</h2>
-      {loading ? (
+      {error ? (
+        <div className="text-red-600">{error}</div>
+      ) : loading ? (
         <div>Loading report...</div>
       ) : (
         <>
