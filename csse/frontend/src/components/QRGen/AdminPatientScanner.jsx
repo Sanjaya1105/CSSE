@@ -472,18 +472,25 @@ const AdminPatientScanner = () => {
 
                       {record.reportUrl && (
                         <div className="bg-yellow-50 p-3 rounded-lg">
-                          <p className="text-sm font-semibold text-yellow-600 mb-1">Report</p>
-                          <a
-                            href={`http://localhost:5000${record.reportUrl}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline flex items-center gap-1"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            View Report PDF
-                          </a>
+                          <p className="text-sm font-semibold text-yellow-600 mb-1">
+                            Report{record.reportUrl.includes(',') ? 's' : ''}
+                          </p>
+                          <div className="space-y-1">
+                            {record.reportUrl.split(',').map((url, idx) => (
+                              <a
+                                key={idx}
+                                href={`http://localhost:5000${url.trim()}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline flex items-center gap-1"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                {record.reportUrl.split(',').length > 1 ? `Report ${idx + 1}` : 'View Report PDF'}
+                              </a>
+                            ))}
+                          </div>
                         </div>
                       )}
 
