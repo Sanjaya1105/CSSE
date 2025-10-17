@@ -4,7 +4,7 @@ import NurseModal from './NurseModal';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const StaffTable = () => {
+const StaffTable = ({ onShowSuccess }) => {
   const navigate = useNavigate();
   // Load previous nurse assignments for selected room and week
   const fetchPreviousAssignments = async (room, start, end) => {
@@ -38,6 +38,9 @@ const StaffTable = () => {
   const [availableNurses, setAvailableNurses] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showStaffTable, setShowStaffTable] = useState(false);
+  const [showDraftModal, setShowDraftModal] = useState(false);
+  const [draftSchedule, setDraftSchedule] = useState([]);
+  const [conflictError, setConflictError] = useState(null);
 
   useEffect(() => {
     // Fetch staff data from backend
@@ -64,6 +67,7 @@ const StaffTable = () => {
     }
     setTableLoading(true);
     setTableError(null);
+    setConflictError(null);
     try {
       const res = await fetch(`/api/room-schedule/${roomNo.trim()}`);
       if (!res.ok) throw new Error('Failed to fetch timetable');
@@ -72,6 +76,15 @@ const StaffTable = () => {
       // Fetch previous nurse assignments for this room and week
       const prevAssignments = await fetchPreviousAssignments(roomNo.trim(), startDate, endDate);
       setNurseAssignments(prevAssignments);
+      // Simulate conflict check (replace with backend call if available)
+      const hasConflict = data.some(slot => slot.conflict); // slot.conflict should be set by backend
+      if (hasConflict) {
+        setConflictError('Conflict found in schedule. Please resolve conflicts before confirming.');
+        setShowDraftModal(true);
+      } else {
+        setDraftSchedule(data);
+        setShowDraftModal(true);
+      }
       setTableLoading(false);
     } catch (err) {
       setTableError(err.message);
@@ -206,7 +219,7 @@ const StaffTable = () => {
           body: JSON.stringify(assignment)
         });
       }
-      alert('All nurse assignments saved successfully!');
+      if (onShowSuccess) onShowSuccess('Schedule saved successfully!');
     } catch (err) {
       alert('Failed to save nurse assignments');
     }
@@ -214,13 +227,8 @@ const StaffTable = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 p-8 flex flex-col items-center">
-      <button
-        className="mb-6 px-6 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-700 transition font-semibold self-start"
-        onClick={() => navigate('/admin-dashboard')}
-      >
-        Go Back to Dashboard
-      </button>
-      <h2 className="text-4xl font-extrabold mb-8 text-blue-700 drop-shadow-lg tracking-wide">Staff List</h2>
+      {/* Go Back to Dashboard button removed as requested */}
+      <h2 className="text-4xl font-extrabold mb-8 text-blue-700 drop-shadow-lg tracking-wide">Staff Schedule</h2>
       <button
         className="mb-6 px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition font-semibold"
         onClick={() => setShowStaffTable((prev) => !prev)}
@@ -286,23 +294,39 @@ const StaffTable = () => {
 
       {tableLoading && <div>Loading timetable...</div>}
       {tableError && <div className="text-red-500">Error: {tableError}</div>}
-      {timetable.length > 0 && (
-        <div className="mt-4 w-full max-w-4xl bg-white shadow-lg rounded-xl p-6 animate-fade-in">
-          <h3 className="text-2xl font-semibold mb-4 text-blue-700">Weekly Doctor Schedule for Room {roomNo}</h3>
-          <ScheduleGrid
-            filteredDoctors={timetable.map(slot => {
-              // Try both keys for nurse assignment
-              const nurse = nurseAssignments[slot._id] || nurseAssignments[slot.doctorId];
-              return nurse ? { ...slot, nurse } : slot;
-            })}
-            onSlotClick={handleSlotClick}
-          />
-          <button
-            className="mt-6 bg-green-600 text-white px-8 py-2 rounded-lg shadow-lg hover:bg-green-700 font-semibold transition-all"
-            onClick={handleSaveAllAssignments}
-          >
-            Save All Nurse Assignments
-          </button>
+      {/* Draft schedule modal for preview and conflict confirmation */}
+      {showDraftModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-4xl relative animate-fade-in overflow-y-auto" style={{ maxHeight: '90vh' }}>
+            <button
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl"
+              onClick={() => { setShowDraftModal(false); setConflictError(null); }}
+              title="Close"
+            >
+              &times;
+            </button>
+            <h3 className="text-xl font-bold mb-4 text-blue-700">Draft Staff Schedule for Room {roomNo}</h3>
+            {conflictError ? (
+              <div className="mb-4 text-red-600 font-semibold">{conflictError}</div>
+            ) : (
+              <div className="mb-4 text-green-700 font-semibold">No conflicts found. Please confirm schedule.</div>
+            )}
+            <ScheduleGrid
+              filteredDoctors={draftSchedule.map(slot => {
+                const nurse = nurseAssignments[slot._id] || nurseAssignments[slot.doctorId];
+                return nurse ? { ...slot, nurse } : slot;
+              })}
+              onSlotClick={handleSlotClick}
+            />
+            {!conflictError && (
+              <button
+                className="mt-6 bg-green-600 text-white px-8 py-2 rounded-lg shadow-lg hover:bg-green-700 font-semibold transition-all"
+                onClick={() => { setShowDraftModal(false); handleSaveAllAssignments(); }}
+              >
+                Confirm & Save Schedule
+              </button>
+            )}
+          </div>
         </div>
       )}
 
