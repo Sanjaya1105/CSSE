@@ -240,3 +240,44 @@ exports.getAppointmentPaymentDetails = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+// Get appointments for a specific user
+exports.getUserAppointments = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const Patient = require('../models/Patient');
+    const patient = await Patient.findById(userId);
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+    
+    // Find appointments by patient name (since appointments store patientName)
+    const appointments = await Appointment.find({ patientName: patient.name })
+      .sort({ date: -1, slotTime: -1 });
+    
+    res.json({ success: true, appointments });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+};
+
+// Delete an appointment
+exports.deleteAppointment = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const appointment = await Appointment.findById(id);
+    if (!appointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+    
+    // Only allow deletion of Pending or Approved appointments
+    if (appointment.status === 'Channeled') {
+      return res.status(400).json({ error: 'Cannot delete channeled appointments' });
+    }
+    
+    await Appointment.findByIdAndDelete(id);
+    res.json({ success: true, message: 'Appointment deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error: ' + err.message });
+  }
+};

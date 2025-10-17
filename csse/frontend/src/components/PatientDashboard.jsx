@@ -89,7 +89,7 @@ const PatientDashboard = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 mt-6">
+            <div className="flex flex-wrap gap-4 mt-6">
               <button
                 className="px-6 py-3 font-semibold text-white transition bg-purple-600 rounded-lg shadow-lg hover:bg-purple-700"
                 onClick={() => setShowQRCode(true)}
@@ -101,6 +101,12 @@ const PatientDashboard = () => {
                 onClick={() => navigate('/my-medical-records')}
               >
                 My Medical Records
+              </button>
+              <button
+                className="px-6 py-3 font-semibold text-white transition bg-green-600 rounded-lg shadow-lg hover:bg-green-700"
+                onClick={() => navigate('/my-appointments')}
+              >
+                My Appointments
               </button>
             </div>
             {/* Show Available Doctors Button */}

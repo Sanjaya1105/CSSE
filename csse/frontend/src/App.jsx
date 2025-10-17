@@ -10,6 +10,7 @@ import PatientScanner from './components/PatientScanner'
 import AdminPatientScanner from './components/AdminPatientScanner'
 import AddMedicalRecord from './components/AddMedicalRecord'
 import MyMedicalRecords from './components/MyMedicalRecords'
+import MyAppointments from './components/MyAppointments'
 import GenerateQRForPatient from './components/GenerateQRForPatient'
 import ViewAllUsers from './components/ViewAllUsers'
 import './App.css'
@@ -36,6 +37,7 @@ function App() {
           <Route path="/admin-patient-scanner" element={<AdminPatientScanner />} />
           <Route path="/add-medical-record" element={<AddMedicalRecord />} />
           <Route path="/my-medical-records" element={<MyMedicalRecords />} />
+          <Route path="/my-appointments" element={<MyAppointments />} />
           <Route path="/generate-qr-for-patient" element={<GenerateQRForPatient />} />
           <Route path="/view-all-users" element={<ViewAllUsers />} />
           <Route path="/staff-management" element={<StaffTable />} />

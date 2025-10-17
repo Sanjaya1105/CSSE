@@ -14,4 +14,8 @@ router.get('/pending', appointmentController.getPendingAppointments);
 router.put('/:id/status', appointmentController.updateAppointmentStatus);
 router.get('/:id/payment-details', appointmentController.getAppointmentPaymentDetails);
 
+// CRUD operations for users
+router.get('/user/:userId', appointmentController.getUserAppointments);
+router.delete('/:id', appointmentController.deleteAppointment);
+
 module.exports = router;
