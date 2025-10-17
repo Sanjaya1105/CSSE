@@ -23,6 +23,7 @@ const AdminDashboard = () => {
   const [searchRoom, setSearchRoom] = React.useState('');
   const [filteredDoctors, setFilteredDoctors] = React.useState([]);
   const [showSchedule, setShowSchedule] = React.useState(false);
+  const [showScheduleModal, setShowScheduleModal] = React.useState(false);
   const [form, setForm] = React.useState(initialForm);
   const [editId, setEditId] = React.useState(null);
   const [showForm, setShowForm] = React.useState(false);
@@ -50,9 +51,11 @@ const AdminDashboard = () => {
     if (!searchRoom.trim()) {
       setFilteredDoctors([]);
       setShowSchedule(false);
+      setShowScheduleModal(false);
     } else {
       setFilteredDoctors(doctors.filter(doc => doc.roomNo === searchRoom.trim()));
       setShowSchedule(true);
+      setShowScheduleModal(true);
     }
   };
 
@@ -244,8 +247,20 @@ const AdminDashboard = () => {
                   Search
                 </button>
               </div>
-              {showSchedule && (
-                <ScheduleGrid filteredDoctors={filteredDoctors} />
+              {showScheduleModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                  <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-4xl relative animate-fade-in overflow-y-auto" style={{ maxHeight: '90vh' }}>
+                    <button
+                      className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl"
+                      onClick={() => setShowScheduleModal(false)}
+                      title="Close"
+                    >
+                      &times;
+                    </button>
+                    <h3 className="text-xl font-bold mb-4 text-blue-700">Weekly Doctor Schedule for Room {searchRoom}</h3>
+                    <ScheduleGrid filteredDoctors={filteredDoctors} />
+                  </div>
+                </div>
               )}
             </div>
           </div>

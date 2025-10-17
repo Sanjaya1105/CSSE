@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 const AdminAppointmentTable = () => {
   const [appointments, setAppointments] = useState([]);
   const [searchDoctor, setSearchDoctor] = useState('');
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     fetch('/api/appointments/patient?patientName=') // empty to get all
@@ -14,6 +15,15 @@ const AdminAppointmentTable = () => {
   const filteredAppointments = searchDoctor.trim()
     ? appointments.filter(a => a.doctorName.toLowerCase().includes(searchDoctor.trim().toLowerCase()))
     : appointments;
+  const displayedAppointments = expanded ? filteredAppointments : filteredAppointments.slice(0, 4);
+
+  // Count booked and channeled appointments for searched doctor
+  let bookedCount = 0;
+  let channeledCount = 0;
+  if (searchDoctor.trim()) {
+    bookedCount = filteredAppointments.filter(a => (a.status || 'Booked').toLowerCase() === 'booked').length;
+    channeledCount = filteredAppointments.filter(a => (a.status || '').toLowerCase() === 'channeled').length;
+  }
 
   return (
     <div className="mt-8">
@@ -34,6 +44,12 @@ const AdminAppointmentTable = () => {
           Search
         </button>
       </div>
+      {searchDoctor.trim() && (
+        <div className="mb-4 flex gap-4 items-center">
+          <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-semibold">Booked Count: {bookedCount}</span>
+          <span className="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-semibold">Channeled Count: {channeledCount}</span>
+        </div>
+      )}
       <table className="w-full border rounded-xl overflow-hidden shadow">
         <thead>
           <tr className="bg-gray-200">
@@ -48,7 +64,7 @@ const AdminAppointmentTable = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredAppointments.map((appt, idx) => (
+          {displayedAppointments.map((appt, idx) => (
             <tr key={appt._id || idx}>
               <td className="border px-2 py-2">{appt.queueNumber}</td>
               <td className="border px-2 py-2">{appt.patientName}</td>
@@ -62,6 +78,15 @@ const AdminAppointmentTable = () => {
           ))}
         </tbody>
       </table>
+      {filteredAppointments.length > 4 && (
+        <button
+          type="button"
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition font-semibold"
+          onClick={() => setExpanded((prev) => !prev)}
+        >
+          {expanded ? 'Collapse' : 'Expand'}
+        </button>
+      )}
     </div>
   );
 };
