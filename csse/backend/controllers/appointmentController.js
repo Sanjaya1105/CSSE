@@ -1,3 +1,36 @@
+// Analytics: Get peak appointment times by hour
+exports.getPeakTimes = async (req, res) => {
+  try {
+    // Aggregate appointments by date and hour
+    const result = await Appointment.aggregate([
+      {
+        $project: {
+          date: 1,
+          // Extract hour from slotTime (format: "HH:mm")
+          hour: { $substr: ["$slotTime", 0, 2] }
+        }
+      },
+      {
+        $group: {
+          _id: { date: "$date", hour: "$hour" },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { "_id.date": 1, "_id.hour": 1 }
+      }
+    ]);
+    // Format for frontend: [{ date, hour, count }]
+    const formatted = result.map(r => ({
+      date: r._id.date,
+      hour: r._id.hour,
+      count: r.count
+    }));
+    res.json(formatted);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 // Get appointments for a doctor by register number (doctorId field)
 exports.getDoctorAppointments = async (req, res) => {
   const { registerNumber } = req.query;
